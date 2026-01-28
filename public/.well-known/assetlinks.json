@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "br.com.kocheautomotiva.guia",
+            "sha256_cert_fingerprints": [
+                "A3:65:EF:74:49:7C:31:B1:19:F2:F7:DD:07:52:29:0A:5F:B7:C9:35:30:E5:E2:CD:63:F2:FE:A7:BC:E9:3B:C8"
+            ]
+        }
+    }
+]
