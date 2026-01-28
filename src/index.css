@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
+  color-scheme: light;
+  /* Force browser to use light theme defaults */
+
   /* Brand Colors */
   --koche-blue: #1A0B3A;
   /* Primary Headers & Nav */

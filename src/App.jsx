@@ -168,7 +168,6 @@ function Dashboard({ logout, onBack }) {
 
       <footer className="app-footer">
         <p>© {new Date().getFullYear()} App Kóche. Todos os direitos reservados.</p>
-        <img src="images/brand/logo-red.svg" alt="Kóche" className="footer-logo" />
       </footer>
     </div>
   )
