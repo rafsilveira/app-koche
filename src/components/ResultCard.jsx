@@ -86,17 +86,33 @@ const ResultCard = ({ data }) => {
                         </div>
 
                         {videoEmbedUrl && (
-                            <div className="info-item media-section">
-                                <span className="info-label">Vídeo do Procedimento</span>
-                                <iframe
-                                    src={videoEmbedUrl}
-                                    title="Vídeo do Procedimento"
-                                    width="100%"
-                                    height="315"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
+                            <div className="info-item media-section" style={{ marginTop: '1.5rem' }}>
+                                <span className="info-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Vídeo do Procedimento</span>
+                                <div style={{
+                                    position: 'relative',
+                                    paddingBottom: '56.25%',
+                                    height: 0,
+                                    background: '#000',
+                                    borderRadius: 'var(--radius-sm)',
+                                    overflow: 'hidden',
+                                    border: '1px solid var(--glass-border)',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+                                }}>
+                                    <iframe
+                                        src={videoEmbedUrl}
+                                        title="Vídeo do Procedimento"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            height: '100%'
+                                        }}
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    ></iframe>
+                                </div>
                             </div>
                         )}
                     </div>

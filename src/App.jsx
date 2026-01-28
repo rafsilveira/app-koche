@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react'
-// import database from './data/database.json'
 import Selector from './components/Selector'
 import ResultCard from './components/ResultCard'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
@@ -8,6 +7,7 @@ import ProfileForm from './components/ProfileForm'
 import ErrorBoundary from './components/ErrorBoundary'
 import { fetchVehicleData } from './services/dataService'
 import CourseScreen from './components/CourseScreen'
+import { BookOpen, GraduationCap, MessageCircle, LogOut, ChevronLeft } from 'lucide-react';
 
 function Dashboard({ logout, onBack }) {
   const [database, setDatabase] = useState([]); // Empty initially
@@ -100,53 +100,25 @@ function Dashboard({ logout, onBack }) {
 
   return (
     <div className="container">
-      <div className="app-header" style={{ position: 'relative', width: '100%' }}>
-        {/* Back Button */}
-        <button
-          onClick={onBack}
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--text-secondary)',
-            fontSize: '1.2rem',
-            cursor: 'pointer',
-            padding: '5px 10px',
-            zIndex: 10
-          }}
-        >
-          ← Voltar
-        </button>
+      <div className="app-header">
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
+          <button onClick={onBack} className="btn-outlined" style={{ padding: '8px 12px', fontSize: '0.9rem' }}>
+            <ChevronLeft size={18} /> Voltar
+          </button>
 
-        <button
-          onClick={logout}
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            background: 'transparent',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-secondary)',
-            padding: '5px 10px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.8rem',
-            zIndex: 10
-          }}
-        >
-          Sair
-        </button>
+          <button onClick={logout} className="btn-outlined" style={{ padding: '8px 12px', color: 'var(--koche-red)', borderColor: 'var(--koche-red)' }}>
+            <LogOut size={18} /> Sair
+          </button>
+        </div>
 
-        <img src="images/brand/logo-silver.svg" alt="Kóche" className="app-logo" />
-        <h1>Guia de Transmissão</h1>
+        <img src="images/brand/logo-red.svg" alt="Kóche" className="app-logo" />
+        <h1 style={{ color: 'var(--koche-blue)' }}>Guia de Transmissão</h1>
       </div>
 
       <div className="card">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <p>Atualizando base de dados...</p>
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+            <p>Carregando base de dados...</p>
           </div>
         ) : (
           <div className="selectors-grid">
@@ -189,12 +161,14 @@ function Dashboard({ logout, onBack }) {
       </div>
 
       {result && (
-        <ResultCard data={result} exact={true} />
+        <div style={{ marginTop: '2rem' }}>
+          <ResultCard data={result} exact={true} />
+        </div>
       )}
 
       <footer className="app-footer">
         <p>© {new Date().getFullYear()} App Kóche. Todos os direitos reservados.</p>
-        <img src="images/brand/logo-silver.svg" alt="Kóche" className="footer-logo" />
+        <img src="images/brand/logo-red.svg" alt="Kóche" className="footer-logo" />
       </footer>
     </div>
   )
@@ -209,76 +183,45 @@ function WelcomeScreen({ onStartGuide, onStartCourse }) {
 
   return (
     <div className="container" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-      <img src="images/brand/logo-silver.svg" alt="Kóche" className="app-logo" style={{ maxWidth: '300px', marginBottom: '3rem' }} />
+      <img
+        src="images/brand/logo-red.svg"
+        alt="Kóche"
+        className="app-logo"
+        style={{ maxWidth: '280px', marginBottom: '3rem' }}
+      />
 
       <div className="card" style={{ maxWidth: '400px', width: '100%', textAlign: 'center', padding: '3rem 2rem' }}>
-        <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', color: 'var(--text-primary)' }}>Bem-vindo</h2>
+        <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', textTransform: 'uppercase', color: 'var(--koche-blue)' }}>Bem-vindo</h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* BOTÃO GUIA */}
+          {/* BOTÃO GUIA (Primary Action) */}
           <button
             onClick={onStartGuide}
-            style={{
-              background: 'var(--brand-silver)',
-              color: 'var(--brand-dark)',
-              border: 'none',
-              padding: '16px',
-              borderRadius: '8px',
-              fontSize: '1.1rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              transition: 'transform 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
-            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+            className="btn-primary" // Uses Blue
+            style={{ padding: '1.25rem' }}
           >
-            📘 Acessar Guia
+            <BookOpen size={24} /> Acessar Guia
           </button>
 
-          {/* BOTÃO CURSO */}
+          {/* BOTÃO CURSO (Secondary Action) */}
           <button
             onClick={onStartCourse}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--brand-silver)',
-              color: 'var(--brand-silver)',
-              padding: '16px',
-              borderRadius: '8px',
-              fontSize: '1.1rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              transition: 'background 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'}
-            onMouseOut={(e) => e.target.style.background = 'transparent'}
+            className="btn-elevated" // White elevated
+            style={{ padding: '1.25rem' }}
           >
-            🎓 Acessar Curso
+            <GraduationCap size={24} /> Acessar Curso
           </button>
 
-          {/* BOTÃO CONTATO */}
+          {/* Spacer */}
+          <div style={{ height: '0.5rem' }}></div>
+
+          {/* BOTÃO CONTATO (Support) */}
           <button
             onClick={handleContact}
-            style={{
-              marginTop: '1rem',
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              padding: '12px',
-              fontSize: '1rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-              textDecoration: 'underline'
-            }}
+            className="btn-outlined"
+            style={{ justifyContent: 'center' }}
           >
-            <span>💬</span> Entrar em Contato
+            <MessageCircle size={20} color="#25D366" /> Entrar em Contato
           </button>
         </div>
       </div>

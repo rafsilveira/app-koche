@@ -39,7 +39,7 @@ E selecionar o 17 como padrão com `archlinux-java` se necessário, mas tente ro
 1.  Crie uma pasta separada para o projeto nativo:
     ```bash
     mkdir android-twa
-    cd android-twa
+    cd android-twaor start a new conversation if the error persists.
     ```
 
 2.  Inicie o processo usando **npx**:
