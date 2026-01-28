@@ -8,6 +8,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true
+      },
       includeAssets: ['vite.svg', 'images/*.png'],
       manifest: {
         name: 'Guia de Aplicação Kóche',

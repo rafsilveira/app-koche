@@ -168,6 +168,7 @@ function Dashboard({ logout, onBack }) {
 
       <footer className="app-footer">
         <p>© {new Date().getFullYear()} App Kóche. Todos os direitos reservados.</p>
+        <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>v1.2 (Light Fix)</span>
       </footer>
     </div>
   )
