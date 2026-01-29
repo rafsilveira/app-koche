@@ -3,6 +3,8 @@ import React, { useMemo } from 'react';
 import { processImageLink, processVideoLink } from '../services/dataService';
 
 const ResultCard = ({ data }) => {
+    if (!data) return null;
+
     // Process links using the centralized service
     // Fallback to old CamelCase keys if new snake_case keys are missing (backward compatibility)
     const connectorImg = processImageLink(data.image_connector_url || data.imageConnector);
@@ -11,8 +13,6 @@ const ResultCard = ({ data }) => {
     const videoEmbedUrl = processVideoLink(data.videolink || data.videoLink || data.videoProcedure); // Handle all keys
 
     const [selectedImage, setSelectedImage] = React.useState(null);
-
-    if (!data) return null;
 
     const renderImageOrText = (imgUrl, rawValue, label) => {
         if (imgUrl) {
