@@ -4,10 +4,11 @@ import { processImageLink, processVideoLink } from '../services/dataService';
 
 const ResultCard = ({ data }) => {
     // Process links using the centralized service
-    const connectorImg = processImageLink(data.imageConnector);
-    const locationImg = processImageLink(data.imageLocation); // Changed from imageConnectionLocation to match Sheets
+    // Fallback to old CamelCase keys if new snake_case keys are missing (backward compatibility)
+    const connectorImg = processImageLink(data.image_connector_url || data.imageConnector);
+    const locationImg = processImageLink(data.image_location_url || data.imageLocation);
 
-    const videoEmbedUrl = processVideoLink(data.videoLink || data.videoProcedure); // Handle both old and new keys
+    const videoEmbedUrl = processVideoLink(data.videolink || data.videoLink || data.videoProcedure); // Handle all keys
 
     const [selectedImage, setSelectedImage] = React.useState(null);
 
@@ -51,20 +52,20 @@ const ResultCard = ({ data }) => {
 
                         <div className="info-item">
                             <span className="info-label">Homologação do Fluido</span>
-                            <div className="info-value">{data.fluidHomologation || "N/A"}</div>
+                            <div className="info-value">{data.fluid || data.fluidHomologation || "N/A"}</div>
                         </div>
 
                         <div className="info-item">
                             <span className="info-label">Quantidade de Fluido</span>
                             <div className="info-value" style={{ whiteSpace: 'pre-line' }}>
-                                {data.fluidQuantity || "N/A"}
+                                {data.fluid_capacities?.raw || data.fluidQuantity || "N/A"}
                             </div>
                         </div>
 
                         <div className="info-item">
                             <span className="info-label">Filtro da Transmissão</span>
                             <div className="info-value" style={{ whiteSpace: 'pre-line' }}>
-                                {data.transmissionFilter || "N/A"}
+                                {data.filter || data.transmissionFilter || "N/A"}
                             </div>
                         </div>
                     </div>
@@ -72,7 +73,7 @@ const ResultCard = ({ data }) => {
                     <div className="info-column">
                         <div className="info-item">
                             <span className="info-label">Conexão da Máquina</span>
-                            <div className="info-value">{data.connectionType || "N/A"}</div>
+                            <div className="info-value">{data.connection || data.connectionType || "N/A"}</div>
                         </div>
 
                         <div className="info-item">

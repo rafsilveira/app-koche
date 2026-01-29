@@ -217,11 +217,13 @@ export default function AdminScreen({ onBack }) {
             setIsSearchingVehicles(true);
             // We reuse the main fetch which has cache
             const allVehicles = await fetchVehicleData();
-            const lower = searchVehicleQuery.toLowerCase();
-            const filtered = allVehicles.filter(v =>
-                (v.brand && v.brand.toLowerCase().includes(lower)) ||
-                (v.model && v.model.toLowerCase().includes(lower))
-            ).slice(0, 50); // Limit to 50
+            const terms = searchVehicleQuery.toLowerCase().split(' ').filter(t => t.length > 0);
+
+            const filtered = allVehicles.filter(v => {
+                const searchString = `${v.brand} ${v.model} ${v.year} ${v.engine}`.toLowerCase();
+                // ALL terms must be found in the combined string
+                return terms.every(term => searchString.includes(term));
+            }).slice(0, 50); // Limit to 50
             setVehicleResults(filtered);
             setIsSearchingVehicles(false);
         };
