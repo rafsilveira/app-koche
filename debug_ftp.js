@@ -26,8 +26,8 @@ async function checkRemote() {
         console.log('PWD:', await client.pwd());
 
         const pathsToCheck = [
-            '/public_html',
-            '/domains/kocheautomotiva.com.br/public_html',
+            '/public_html/guia-transmissao',
+            '/domains/kocheautomotiva.com.br/public_html/guia-aplicacao-transmissao',
             // Try relative path if valid
             'public_html'
         ];

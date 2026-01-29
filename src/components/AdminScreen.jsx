@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { addVehicle, getAdmins, addAdmin, removeAdmin, searchUsers, getAllUsers, updateVehicle, deleteVehicle, fetchVehicleData } from '../services/dataService';
 import { ChevronLeft, ChevronDown, ChevronUp, Database, Plus, Save, AlertTriangle, CheckCircle, Users, Trash, Download, Search, Edit, X } from 'lucide-react';
+import './AdminScreen.css';
+import PropTypes from 'prop-types';
 
 export default function AdminScreen({ onBack }) {
 
@@ -439,7 +441,7 @@ export default function AdminScreen({ onBack }) {
     );
 
     return (
-        <div className="container" style={{ paddingBottom: '4rem', minHeight: '100vh', background: '#121212', color: '#fff' }}>
+        <div className="container admin-screen">
             <div className="app-header">
                 <div style={{ width: '100%', display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                     <button onClick={onBack} className="btn-outlined" style={{ padding: '8px 12px', color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}>
@@ -795,44 +797,10 @@ export default function AdminScreen({ onBack }) {
                 </>
             )}
 
-            <style>{`
-                .form-group { display: flex; flexDirection: column; gap: 0.3rem; }
-                .form-row { display: flex; gap: 1rem; }
-                .form-row .form-group { flex: 1; }
-                .admin-input {
-                    background: #1a1a1a;
-                    border: 1px solid rgba(255,255,255,0.1);
-                    padding: 10px;
-                    border-radius: 8px;
-                    color: white;
-                    font-size: 1rem;
-                }
-                .admin-input:focus {
-                    outline: none;
-                    border-color: var(--koche-red);
-                }
-                /* Fix for Chrome/Safari Autofill white background */
-                .admin-input:-webkit-autofill,
-                .admin-input:-webkit-autofill:hover,
-                .admin-input:-webkit-autofill:focus,
-                .admin-input:-webkit-autofill:active {
-                    -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
-                    -webkit-text-fill-color: white !important;
-                }
-                label {
-                    font-size: 0.9rem;
-                    color: #ffffff;
-                    font-weight: 600;
-                    margin-left: 2px;
-                }
-                .card {
-                    background: #1e1e1e;
-                    border: 1px solid #333;
-                    border-radius: 8px;
-                    padding: 1.5rem;
-                    margin-bottom: 2rem;
-                }
-            `}</style>
         </div>
     );
 }
+
+AdminScreen.propTypes = {
+    onBack: PropTypes.func.isRequired
+};

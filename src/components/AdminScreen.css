@@ -1,0 +1,61 @@
+.admin-screen {
+  background-color: #121212;
+  color: #fff;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
+
+.admin-screen .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-screen .form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.admin-screen .form-row .form-group {
+  flex: 1;
+}
+
+.admin-screen .admin-input {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+}
+
+.admin-screen .admin-input:focus {
+  outline: none;
+  border-color: var(--koche-red);
+}
+
+/* Fix for Chrome/Safari Autofill white background */
+.admin-screen .admin-input:-webkit-autofill,
+.admin-screen .admin-input:-webkit-autofill:hover,
+.admin-screen .admin-input:-webkit-autofill:focus,
+.admin-screen .admin-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
+  -webkit-text-fill-color: white !important;
+}
+
+.admin-screen label {
+  font-size: 0.9rem;
+  color: #ffffff;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+/* Scoped Card for Admin - Overrides global .card */
+.admin-screen .card {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: none; /* Reset global shadow if needed */
+}

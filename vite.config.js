@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     react(),
+    /*
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
@@ -35,6 +36,7 @@ export default defineConfig({
         ]
       }
     })
+    */
   ],
   base: '/guia-de-aplicacao/',
 })
