@@ -30,3 +30,4 @@ dist-ssr
 # Android TWA build artifacts
 android-twa/
 
+.env

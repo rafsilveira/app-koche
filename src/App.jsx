@@ -7,7 +7,8 @@ import ProfileForm from './components/ProfileForm'
 import ErrorBoundary from './components/ErrorBoundary'
 import { fetchVehicleData } from './services/dataService'
 import CourseScreen from './components/CourseScreen'
-import { BookOpen, GraduationCap, MessageCircle, LogOut, ChevronLeft } from 'lucide-react';
+import { BookOpen, GraduationCap, MessageCircle, LogOut, ChevronLeft, Bot } from 'lucide-react';
+import AssistantScreen from './components/AssistantScreen';
 
 function Dashboard({ logout, onBack }) {
   const [database, setDatabase] = useState([]); // Empty initially
@@ -168,13 +169,13 @@ function Dashboard({ logout, onBack }) {
 
       <footer className="app-footer">
         <p>© {new Date().getFullYear()} App Kóche. Todos os direitos reservados.</p>
-        <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>v1.2 (Light Fix)</span>
+        <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>v1.3 (AI Assistant)</span>
       </footer>
     </div>
   )
 }
 
-function WelcomeScreen({ onStartGuide, onStartCourse }) {
+function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant }) {
   const handleContact = () => {
     const phone = "551938623362";
     const text = encodeURIComponent("Estou no aplicativo e gostaria de saber mais");
@@ -201,6 +202,15 @@ function WelcomeScreen({ onStartGuide, onStartCourse }) {
             style={{ padding: '1.25rem' }}
           >
             <BookOpen size={24} /> Acessar Guia
+          </button>
+
+          {/* BOTÃO ASSISTENTE (Secondary Action) */}
+          <button
+            onClick={onStartAssistant}
+            className="btn-elevated"
+            style={{ padding: '1.25rem', color: 'var(--koche-blue)', border: '1px solid var(--koche-blue)' }}
+          >
+            <Bot size={24} /> Assistente Virtual
           </button>
 
           {/* BOTÃO CURSO (Secondary Action) */}
@@ -231,7 +241,15 @@ function WelcomeScreen({ onStartGuide, onStartCourse }) {
 
 function AppContent() {
   const { currentUser, userProfile, logout } = useAuth();
-  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course'
+  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'assistant'
+
+  // Also load database here to pass to Assistant? Or let Assistant fetch it?
+  // Ideally, AssistantScreen fetches, but it's small enough to share if logical.
+
+  const [database, setDatabase] = useState([]);
+  useEffect(() => {
+    fetchVehicleData().then(data => setDatabase(data));
+  }, []);
 
   console.log("AppContent Render:", { currentUser, userProfile, currentView });
 
@@ -253,12 +271,17 @@ function AppContent() {
       <WelcomeScreen
         onStartGuide={() => setCurrentView('guide')}
         onStartCourse={() => setCurrentView('course')}
+        onStartAssistant={() => setCurrentView('assistant')}
       />
     );
   }
 
   if (currentView === 'course') {
     return <CourseScreen onBack={() => setCurrentView('welcome')} />;
+  }
+
+  if (currentView === 'assistant') {
+    return <AssistantScreen onBack={() => setCurrentView('welcome')} database={database} />;
   }
 
   // Default: Guide (Dashboard)
