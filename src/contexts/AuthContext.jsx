@@ -8,7 +8,7 @@ import {
     RecaptchaVerifier,
     linkWithPhoneNumber
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { sendLeadToExternal } from '../services/leads';
 
 const AuthContext = createContext();
@@ -21,6 +21,10 @@ export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
     const [userProfile, setUserProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    // ADMIN EMAIL
+    const ADMIN_EMAIL = "rafsilveira@gmail.com";
 
     // Sign in with Google
     const loginGoogle = async () => {
@@ -78,6 +82,24 @@ export function AuthProvider({ children }) {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setCurrentUser(user);
             if (user) {
+                // Check Admin (Hardcoded OR Firestore)
+                let isAdminUser = user.email === ADMIN_EMAIL;
+
+                if (!isAdminUser) {
+                    // Check Firestore 'admins' collection
+                    try {
+                        const adminsSnap = await getDocs(collection(db, "admins"));
+                        const adminEmails = adminsSnap.docs.map(doc => doc.data().email);
+                        if (adminEmails.includes(user.email)) {
+                            isAdminUser = true;
+                        }
+                    } catch (e) {
+                        console.error("Error checking admin collection", e);
+                    }
+                }
+
+                setIsAdmin(isAdminUser);
+
                 // Fetch extra profile data (phone, etc)
                 const userDocRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userDocRef);
@@ -88,6 +110,7 @@ export function AuthProvider({ children }) {
                 }
             } else {
                 setUserProfile(null);
+                setIsAdmin(false);
             }
             setLoading(false);
         });
@@ -127,7 +150,8 @@ export function AuthProvider({ children }) {
         updateProfileData,
         setupRecaptcha,
         startPhoneVerification,
-        loading
+        loading,
+        isAdmin
     };
 
     return (

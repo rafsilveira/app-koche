@@ -9,6 +9,7 @@ import { fetchVehicleData } from './services/dataService'
 import CourseScreen from './components/CourseScreen'
 import { BookOpen, GraduationCap, MessageCircle, LogOut, ChevronLeft, Bot } from 'lucide-react';
 import AssistantScreen from './components/AssistantScreen';
+import AdminScreen from './components/AdminScreen';
 
 function Dashboard({ logout, onBack }) {
   const [database, setDatabase] = useState([]); // Empty initially
@@ -175,7 +176,7 @@ function Dashboard({ logout, onBack }) {
   )
 }
 
-function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant }) {
+function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin, isAdmin }) {
   const handleContact = () => {
     const phone = "551938623362";
     const text = encodeURIComponent("Estou no aplicativo e gostaria de saber mais");
@@ -233,6 +234,21 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant }) {
           >
             <MessageCircle size={20} color="#25D366" /> Entrar em Contato
           </button>
+
+          {/* ADMIN BUTTON (Visible only to Admin) */}
+          {isAdmin && (
+            <>
+              <div style={{ height: '0.5rem' }}></div>
+              <button
+                onClick={onAdmin}
+                className="btn-outlined"
+                style={{ justifyContent: 'center', borderColor: '#333', color: '#666' }}
+              >
+                Painel Admin
+              </button>
+            </>
+          )}
+
         </div>
       </div>
     </div>
@@ -240,8 +256,8 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant }) {
 }
 
 function AppContent() {
-  const { currentUser, userProfile, logout } = useAuth();
-  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'assistant'
+  const { currentUser, userProfile, logout, isAdmin } = useAuth();
+  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'assistant' | 'admin'
 
   // Also load database here to pass to Assistant? Or let Assistant fetch it?
   // Ideally, AssistantScreen fetches, but it's small enough to share if logical.
@@ -272,6 +288,8 @@ function AppContent() {
         onStartGuide={() => setCurrentView('guide')}
         onStartCourse={() => setCurrentView('course')}
         onStartAssistant={() => setCurrentView('assistant')}
+        onAdmin={() => setCurrentView('admin')}
+        isAdmin={isAdmin}
       />
     );
   }
@@ -282,6 +300,10 @@ function AppContent() {
 
   if (currentView === 'assistant') {
     return <AssistantScreen onBack={() => setCurrentView('welcome')} database={database} />;
+  }
+
+  if (currentView === 'admin' && isAdmin) {
+    return <AdminScreen onBack={() => setCurrentView('welcome')} />;
   }
 
   // Default: Guide (Dashboard)
