@@ -1,4 +1,4 @@
-import { BookOpen, GraduationCap, MessageCircle, Bot } from 'lucide-react';
+import { BookOpen, GraduationCap, MessageCircle, Bot, Download } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin, isAdmin }) {
@@ -6,6 +6,16 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
         const phone = "551938623362";
         const text = encodeURIComponent("Estou no aplicativo e gostaria de saber mais");
         window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+    };
+
+    const handleDownloadEbook = () => {
+        const ebookUrl = '/guia-de-aplicacao/ebooks/troca-fluido-transmissao.pdf';
+        const link = document.createElement('a');
+        link.href = ebookUrl;
+        link.download = 'troca-fluido-transmissao-koche.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
@@ -48,6 +58,15 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                         <GraduationCap size={24} /> Acessar Curso
                     </button>
 
+                    {/* BOTÃO EBOOK (New Action) */}
+                    <button
+                        onClick={handleDownloadEbook}
+                        className="btn-elevated"
+                        style={{ padding: '1.25rem', color: 'var(--koche-red)', border: '1px solid var(--koche-red)' }}
+                    >
+                        <Download size={24} /> Baixar Ebook Grátis
+                    </button>
+
                     {/* Spacer */}
                     <div style={{ height: '0.5rem' }}></div>
 
@@ -75,6 +94,12 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                     )}
 
                 </div>
+            </div>
+
+            <div style={{ marginTop: '2.5rem', maxWidth: '600px', textAlign: 'center', padding: '0 1.5rem' }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+                    <strong style={{ color: 'var(--koche-red)' }}>Aviso Legal:</strong> As informações e imagens apresentadas neste aplicativo têm caráter informativo e podem não se aplicar a todos os veículos ou situações. O procedimento correto deve sempre ser confirmado no manual do fabricante do veículo. A execução do serviço é de responsabilidade do profissional que o realiza.
+                </p>
             </div>
         </div>
     );

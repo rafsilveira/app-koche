@@ -162,7 +162,12 @@ function Dashboard({ logout, onBack }) {
                 </div>
             )}
 
-            <footer className="app-footer">
+            <footer className="app-footer" style={{ textAlign: 'center', marginTop: '2.5rem', paddingBottom: '2rem' }}>
+                <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', maxWidth: '800px', margin: '0 auto 1.5rem auto' }}>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+                        <strong style={{ color: 'var(--koche-red)' }}>Aviso Legal:</strong> As informações e imagens apresentadas neste aplicativo têm caráter informativo e podem não se aplicar a todos os veículos ou situações. O procedimento correto deve sempre ser confirmado no manual do fabricante do veículo. A execução do serviço é de responsabilidade do profissional que o realiza.
+                    </p>
+                </div>
                 <p>© {new Date().getFullYear()} App Kóche. Todos os direitos reservados.</p>
                 <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>v1.3 (AI Assistant)</span>
             </footer>
