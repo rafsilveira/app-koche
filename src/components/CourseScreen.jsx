@@ -6,10 +6,9 @@ const COURSES = [
     {
         id: 1,
         title: "Aula 1: Teórica",
-        description: "Fundamentos e conceitos básicos. (Em breve)",
-        videoUrl: "",
-        thumbnail: "images/brand/logo-silver.svg", // Placeholder branding
-        isComingSoon: true
+        description: "Fundamentos e conceitos básicos.",
+        videoUrl: "https://youtu.be/tD9ieJkbQec",
+        thumbnail: "https://img.youtube.com/vi/tD9ieJkbQec/mqdefault.jpg"
     },
     {
         id: 2,
