@@ -57,22 +57,6 @@ export default function AssistantScreen({ onBack, database }) {
                 </div>
             </div>
 
-            {/* BANNER EM BREVE (Overlay or Top Banner) */}
-            <div style={{
-                backgroundColor: '#FFF4E5',
-                color: '#663C00',
-                padding: '12px',
-                borderRadius: '8px',
-                marginBottom: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                border: '1px solid #FFCC80'
-            }}>
-                <Info size={20} />
-                <span style={{ fontWeight: 600 }}>Em Breve:</span>
-                <span>A Inteligência Artificial ainda está aprendendo.</span>
-            </div>
 
             {/* Chat Area */}
             <div style={{

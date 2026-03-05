@@ -2,11 +2,11 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../services/firebase';
 import {
     GoogleAuthProvider,
-    signInWithPopup,
+    signInWithRedirect,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
     signOut,
-    onAuthStateChanged,
-    RecaptchaVerifier,
-    linkWithPhoneNumber
+    onAuthStateChanged
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { sendLeadToExternal } from '../services/leads';
@@ -30,25 +30,38 @@ export function AuthProvider({ children }) {
     const loginGoogle = async () => {
         const provider = new GoogleAuthProvider();
         try {
-            const result = await signInWithPopup(auth, provider);
-            // Check if user exists in Firestore, if not create basic record
-            const userDocRef = doc(db, "users", result.user.uid);
-            const userSnap = await getDoc(userDocRef);
-
-            if (!userSnap.exists()) {
-                // Create basic profile from Google data
-                const newUser = {
-                    name: result.user.displayName,
-                    email: result.user.email,
-                    createdAt: new Date(),
-                };
-                await setDoc(userDocRef, newUser);
-
-                // If the user already has a phone (unlikely from Google alone, but possible), send lead
-                // But usually we wait for the ProfileForm to capture the phone
-            }
+            await signInWithRedirect(auth, provider);
         } catch (error) {
             console.error("Login failed", error);
+            throw error;
+        }
+    };
+
+    // Sign in with Email/Password
+    const loginEmailPassword = async (email, password) => {
+        try {
+            const result = await signInWithEmailAndPassword(auth, email, password);
+            return result;
+        } catch (error) {
+            console.error("Email login failed", error);
+            throw error;
+        }
+    };
+
+    // Sign up with Email/Password
+    const signupEmailPassword = async (email, password, name) => {
+        try {
+            const result = await createUserWithEmailAndPassword(auth, email, password);
+            const userDocRef = doc(db, "users", result.user.uid);
+            const newUser = {
+                name: name,
+                email: email,
+                createdAt: new Date(),
+            };
+            await setDoc(userDocRef, newUser);
+            return result;
+        } catch (error) {
+            console.error("Email signup failed", error);
             throw error;
         }
     };
@@ -106,7 +119,14 @@ export function AuthProvider({ children }) {
                 if (userSnap.exists()) {
                     setUserProfile(userSnap.data());
                 } else {
-                    setUserProfile(null);
+                    // Create basic profile for new Google logins (from redirect) or edge cases
+                    const newUser = {
+                        name: user.displayName || user.email?.split('@')[0] || 'Usuário',
+                        email: user.email,
+                        createdAt: new Date(),
+                    };
+                    await setDoc(userDocRef, newUser);
+                    setUserProfile(newUser);
                 }
             } else {
                 setUserProfile(null);
@@ -118,38 +138,14 @@ export function AuthProvider({ children }) {
         return unsubscribe;
     }, []);
 
-    // Initial setup for Recaptcha
-    const setupRecaptcha = (elementId) => {
-        if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
-                'size': 'invisible', // or 'normal'
-                'callback': (response) => {
-                    // reCAPTCHA solved
-                }
-            });
-        }
-        return window.recaptchaVerifier;
-    };
-
-    // Link Phone Number (Send SMS)
-    const startPhoneVerification = async (phoneNumber, recaptchaVerifier) => {
-        try {
-            // This returns a confirmationResult object with a .confirm(otp) method
-            return await linkWithPhoneNumber(currentUser, phoneNumber, recaptchaVerifier);
-        } catch (error) {
-            console.error("Error sending SMS:", error);
-            throw error;
-        }
-    };
-
     const value = {
         currentUser,
         userProfile,
         loginGoogle,
+        loginEmailPassword,
+        signupEmailPassword,
         logout,
         updateProfileData,
-        setupRecaptcha,
-        startPhoneVerification,
         loading,
         isAdmin
     };

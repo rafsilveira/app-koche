@@ -14,7 +14,7 @@ const config = {
 };
 
 // Destination path on the server
-const REMOTE_PATH = process.env.REMOTE_PATH || '/domains/kocheautomotiva.com.br/public_html/guia-aplicacao-transmissao';
+const REMOTE_PATH = process.env.REMOTE_PATH || '/domains/kocheautomotiva.com.br/public_html/guia-de-aplicacao';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

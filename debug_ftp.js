@@ -26,28 +26,15 @@ async function checkRemote() {
         console.log('PWD:', await client.pwd());
 
         const pathsToCheck = [
-            '/public_html/guia-transmissao',
-            '/domains/kocheautomotiva.com.br/public_html/guia-aplicacao-transmissao',
-            // Try relative path if valid
-            'public_html'
+            '/public_html/guia-de-aplicacao/assets',
+            '/public_html/assets',
+            '/public_html/guia-aplicacao-transmissao/assets'
         ];
 
-        for (const p of pathsToCheck) {
-            try {
-                console.log(`\n🔎 Checking: ${p}`);
-                const files = await client.list(p);
-                const defaultFile = files.find(f => f.name === 'default.php');
-                if (defaultFile) {
-                    console.log(`✅ FOUND default.php in ${p}`);
-                } else {
-                    console.log(`❌ No default.php in ${p}`);
-                }
-                // List first 5 files to get an idea
-                files.slice(0, 5).forEach(f => console.log(`   - ${f.name}`));
-            } catch (e) {
-                console.log(`⚠️ Could not list ${p}: ${e.message}`);
-            }
-        }
+        const p = '/public_html/guia-de-aplicacao';
+        console.log(`\n🔎 Checking: ${p}`);
+        await client.downloadTo('server_index.html', `${p}/index.html`);
+        console.log('✅ Downloaded server_index.html');
 
     } catch (err) {
         console.error('❌ Error:', err);

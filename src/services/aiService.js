@@ -27,55 +27,67 @@ export async function sendMessageToAI(userMessage, database) {
         };
     }
 
-    // Optimize context: Convert DB to a lightweight string
-    // We only need Brand, Model, Year, Engine and maybe Transmission to identify the car.
-    // We don't need the full image URLs in the context to save tokens, but Gemini 1.5 has a huge window so it's fine.
+    // Improve context optimization: 
+    // If the message is short, we might be looking for a car.
+    // If it's long, it might be a troubleshooting question.
     const contextString = JSON.stringify(database.map(d => ({
         b: d.brand,
         m: d.model,
         y: d.year,
         e: d.engine,
-        oil: d.fluid, // Helpful for troubleshooting "low oil"
-        trans: d.transmission
+        oil: d.fluid,
+        trans: d.transmission,
+        part: d.fluid_capacities?.partial_change,
+        tot: d.fluid_capacities?.total_capacity
     })));
 
     const systemPrompt = `
-    You are an expert vehicle transmission mechanic assistant for the "Kóche Guia" app.
-    
-    YOUR GOAL:
-    1. Identify if the user wants to FIND a vehicle or solve a PROBLEM.
-    2. If finding a vehicle, key match against the provided DATABASE.
-    3. If solving a problem, provide brief technical advice.
+    Você é o Engenheiro Especialista em Transmissões da Kóche Automotiva. 
+    Seu papel é auxiliar mecânicos profissionais com informações precisas e técnicas.
 
-    DATABASE:
+    OBJETIVOS:
+    1. IDENTIFICAÇÃO DE VEÍCULO: Ajude o mecânico a encontrar o fluido correto, filtro e capacidades.
+    2. DIAGNÓSTICO TÉCNICO: Forneça orientações sobre problemas comuns em transmissões automáticas (trancos, patinação, códigos de erro).
+    3. PROCEDIMENTO: Explique brevemente como verificar o nível ou realizar a troca se solicitado.
+
+    DADOS DISPONÍVEIS (DATABASE):
     ${contextString}
 
-    INSTRUCTIONS:
-    - Respond in Brazilian Portuguese.
-    - Output MUST be valid JSON.
-    - Format: { "message": "string", "action": "SELECT_VEHICLE" | null, "target": { "brand": "...", "model": "...", "year": "...", "engine": "..." } | null }
-    - If you find a vehicle match, set action to "SELECT_VEHICLE" and fill "target" EXACTLY as it appears in the database.
-    - If multiple matches, ask for clarification in "message".
-    - If the user asks about a problem (e.g., "doesn't shift", "slipping"), explain potential causes (fluid level, air, solenoid) in "message" and set action to null.
-  `;
+    REGRAS DE RESPOSTA:
+    - Responda SEMPRE em Português Brasileiro, de forma profissional e direta.
+    - Use Markdown para formatar tabelas ou listas se necessário na sua mensagem.
+    - O retorno DEVE ser um objeto JSON puro, sem blocos de código markdown.
+    - Se encontrar o veículo, defina "action" como "SELECT_VEHICLE" e preencha "target" com os dados exatos do banco.
+    - Se o usuário perguntar sobre um problema, use seu conhecimento geral de transmissões automáticas para dar uma dica técnica valiosa antes de sugerir verificar o fluido.
+
+    FORMATO JSON DE SAÍDA:
+    {
+      "message": "Sua resposta textual aqui (pode conter markdown)",
+      "action": "SELECT_VEHICLE" | null,
+      "target": { "brand": "...", "model": "...", "year": "...", "engine": "..." } | null
+    }
+    `;
 
     try {
         const result = await model.generateContent([
             systemPrompt,
-            `User says: "${userMessage}"`
+            `Mecânico pergunta: "${userMessage}"`
         ]);
 
         const responseText = result.response.text();
 
-        // Clean code blocks if present
-        const cleanText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+        // Robust JSON extraction
+        let cleanText = responseText;
+        if (cleanText.includes('{')) {
+            cleanText = cleanText.substring(cleanText.indexOf('{'), cleanText.lastIndexOf('}') + 1);
+        }
 
         return JSON.parse(cleanText);
 
     } catch (error) {
         console.error("AI Error:", error);
         return {
-            message: "Desculpe, tive um problema ao processar sua solicitação. Tente novamente.",
+            message: "Desculpe, tive um problema técnico ao processar seu diagnóstico. Por favor, tente novamente ou verifique sua conexão.",
             action: null
         };
     }
