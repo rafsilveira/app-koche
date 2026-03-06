@@ -3,10 +3,12 @@ import { auth, db } from '../services/firebase';
 import {
     GoogleAuthProvider,
     signInWithRedirect,
+    signInWithPopup,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    getRedirectResult
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { sendLeadToExternal } from '../services/leads';
@@ -30,10 +32,29 @@ export function AuthProvider({ children }) {
     const loginGoogle = async () => {
         const provider = new GoogleAuthProvider();
         try {
-            await signInWithRedirect(auth, provider);
+            // Try popup first (works best on desktop, fails on some mobile ad-blockers/in-app browsers)
+            const result = await signInWithPopup(auth, provider);
+
+            // If successful via popup, ensure user profile exists
+            const userDocRef = doc(db, "users", result.user.uid);
+            const userSnap = await getDoc(userDocRef);
+
+            if (!userSnap.exists()) {
+                const newUser = {
+                    name: result.user.displayName || result.user.email?.split('@')[0] || 'Usuário',
+                    email: result.user.email,
+                    createdAt: new Date(),
+                };
+                await setDoc(userDocRef, newUser);
+            }
         } catch (error) {
-            console.error("Login failed", error);
-            throw error;
+            console.error("Popup failed", error);
+            // If popup is blocked or not supported, fallback to redirect
+            if (error.code === 'auth/popup-blocked' || error.code === 'auth/unauthorized-domain') {
+                await signInWithRedirect(auth, provider);
+            } else {
+                throw error;
+            }
         }
     };
 
@@ -92,6 +113,29 @@ export function AuthProvider({ children }) {
     };
 
     useEffect(() => {
+        // Handle the result from signInWithRedirect if it was used
+        const handleRedirect = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result && result.user) {
+                    const userDocRef = doc(db, "users", result.user.uid);
+                    const userSnap = await getDoc(userDocRef);
+                    if (!userSnap.exists()) {
+                        const newUser = {
+                            name: result.user.displayName || result.user.email?.split('@')[0] || 'Usuário',
+                            email: result.user.email,
+                            createdAt: new Date(),
+                        };
+                        await setDoc(userDocRef, newUser);
+                    }
+                }
+            } catch (err) {
+                console.error("Redirect result error:", err);
+            }
+        };
+
+        handleRedirect();
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setCurrentUser(user);
             if (user) {
@@ -119,14 +163,15 @@ export function AuthProvider({ children }) {
                 if (userSnap.exists()) {
                     setUserProfile(userSnap.data());
                 } else {
-                    // Create basic profile for new Google logins (from redirect) or edge cases
-                    const newUser = {
-                        name: user.displayName || user.email?.split('@')[0] || 'Usuário',
-                        email: user.email,
-                        createdAt: new Date(),
-                    };
-                    await setDoc(userDocRef, newUser);
-                    setUserProfile(newUser);
+                    // Give a tiny delay in case redirect result is still writing
+                    setTimeout(async () => {
+                        const snap = await getDoc(userDocRef);
+                        if (snap.exists()) {
+                            setUserProfile(snap.data());
+                        } else {
+                            setUserProfile(null);
+                        }
+                    }, 1000);
                 }
             } else {
                 setUserProfile(null);
