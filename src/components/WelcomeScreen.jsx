@@ -1,7 +1,7 @@
-import { BookOpen, GraduationCap, MessageCircle, Bot, Download } from 'lucide-react';
+import { BookOpen, GraduationCap, MessageCircle, Bot, Download, User } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin, isAdmin }) {
+function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin, onProfile, isAdmin }) {
     const handleContact = () => {
         const phone = "551938623362";
         const text = encodeURIComponent("Estou no aplicativo e gostaria de saber mais");
@@ -70,6 +70,15 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                     {/* Spacer */}
                     <div style={{ height: '0.5rem' }}></div>
 
+                    {/* BOTÃO MINHA CONTA (Profile) */}
+                    <button
+                        onClick={onProfile}
+                        className="btn-elevated"
+                        style={{ padding: '1rem', color: 'var(--text-primary)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-dark)' }}
+                    >
+                        <User size={20} /> Minha Conta
+                    </button>
+
                     {/* BOTÃO CONTATO (Support) */}
                     <button
                         onClick={handleContact}
@@ -110,6 +119,7 @@ WelcomeScreen.propTypes = {
     onStartCourse: PropTypes.func.isRequired,
     onStartAssistant: PropTypes.func.isRequired,
     onAdmin: PropTypes.func.isRequired,
+    onProfile: PropTypes.func.isRequired,
     isAdmin: PropTypes.bool
 };
 

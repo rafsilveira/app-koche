@@ -8,7 +8,8 @@ import {
     createUserWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    getRedirectResult
+    getRedirectResult,
+    updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { sendLeadToExternal } from '../services/leads';
@@ -95,16 +96,27 @@ export function AuthProvider({ children }) {
     // Update Profile (e.g. adding phone)
     const updateProfileData = async (data) => {
         if (!currentUser) return;
+
+        // 1. Update Firestore Document
         const userDocRef = doc(db, "users", currentUser.uid);
         await setDoc(userDocRef, data, { merge: true });
 
-        // Update local state
+        // 2. Update Firebase Auth Profile (if name changed)
+        if (data.name && data.name !== currentUser.displayName) {
+            try {
+                await updateProfile(currentUser, { displayName: data.name });
+            } catch (err) {
+                console.error("Error updating firebase auth profile", err);
+            }
+        }
+
+        // 3. Update local state
         setUserProfile(prev => ({ ...prev, ...data }));
 
-        // INTEGRATION: Send lead if we have a phone number now
+        // 4. INTEGRATION: Send lead if we have a phone number now
         if (data.phone) {
             sendLeadToExternal({
-                name: currentUser.displayName,
+                name: data.name || currentUser.displayName,
                 email: currentUser.email,
                 phone: data.phone,
                 uid: currentUser.uid

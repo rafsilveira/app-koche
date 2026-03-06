@@ -5,7 +5,7 @@ import { fetchVehicleData } from '../services/dataService';
 import { LogOut, ChevronLeft } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-function Dashboard({ logout, onBack }) {
+function Dashboard({ onBack }) {
     const [database, setDatabase] = useState([]); // Empty initially
     const [loading, setLoading] = useState(true);
 
@@ -97,13 +97,9 @@ function Dashboard({ logout, onBack }) {
     return (
         <div className="container">
             <div className="app-header">
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', marginBottom: '1rem', alignItems: 'center' }}>
                     <button onClick={onBack} className="btn-outlined" style={{ padding: '8px 12px', fontSize: '0.9rem' }}>
                         <ChevronLeft size={18} /> Voltar
-                    </button>
-
-                    <button onClick={logout} className="btn-outlined" style={{ padding: '8px 12px', color: 'var(--koche-red)', borderColor: 'var(--koche-red)' }}>
-                        <LogOut size={18} /> Sair
                     </button>
                 </div>
 
@@ -176,7 +172,6 @@ function Dashboard({ logout, onBack }) {
 }
 
 Dashboard.propTypes = {
-    logout: PropTypes.func.isRequired,
     onBack: PropTypes.func.isRequired,
 };
 

@@ -9,10 +9,11 @@ import AssistantScreen from './components/AssistantScreen';
 import AdminScreen from './components/AdminScreen';
 import Dashboard from './components/Dashboard';
 import WelcomeScreen from './components/WelcomeScreen';
+import UserArea from './components/UserArea';
 
 function AppContent() {
-  const { currentUser, userProfile, logout, isAdmin } = useAuth();
-  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'assistant' | 'admin'
+  const { currentUser, userProfile, isAdmin } = useAuth();
+  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'assistant' | 'admin' | 'profile'
 
   // Also load database here to pass to Assistant? Or let Assistant fetch it?
   // Ideally, AssistantScreen fetches, but it's small enough to share if logical.
@@ -44,6 +45,7 @@ function AppContent() {
         onStartCourse={() => setCurrentView('course')}
         onStartAssistant={() => setCurrentView('assistant')}
         onAdmin={() => setCurrentView('admin')}
+        onProfile={() => setCurrentView('profile')}
         isAdmin={isAdmin}
       />
     );
@@ -61,8 +63,12 @@ function AppContent() {
     return <AdminScreen onBack={() => setCurrentView('welcome')} />;
   }
 
+  if (currentView === 'profile') {
+    return <UserArea onBack={() => setCurrentView('welcome')} />;
+  }
+
   // Default: Guide (Dashboard)
-  return <Dashboard logout={logout} onBack={() => setCurrentView('welcome')} />;
+  return <Dashboard onBack={() => setCurrentView('welcome')} />;
 }
 
 function App() {
