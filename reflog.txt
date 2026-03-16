@@ -1,0 +1,10 @@
+0715ce2 HEAD@{0}: commit: chore: update walkthrough
+1591140 HEAD@{1}: checkout: moving from 89a057d3886c7672952a515865c062dd291ec71d to main
+89a057d HEAD@{2}: commit: feat: add user profile area and update navigation
+beaf4f6 HEAD@{3}: pull --rebase origin main (start): checkout beaf4f64b1b39e113994d3b327dd80b9562e04ec
+1591140 HEAD@{4}: commit: fix: use signInWithPopup with fallback to signInWithRedirect
+f4b6cdd HEAD@{5}: commit: feat: add course video and improve login flow
+01eda8b HEAD@{6}: commit: feat: update login with email/password and simplify phone number collection
+d6393b8 HEAD@{7}: commit: feat: adicionar nota de responsabilidade/disclaimer nas telas
+35e25ee HEAD@{8}: commit: docs: adiciona arquivos de memória persistente da IA
+e9846d4 HEAD@{9}: pull: Fast-forward
