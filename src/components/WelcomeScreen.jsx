@@ -1,7 +1,11 @@
 import { BookOpen, GraduationCap, MessageCircle, Bot, Download, User } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { useAuth } from '../contexts/AuthContext';
 
 function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin, onProfile, isAdmin }) {
+    const { currentUser, userProfile } = useAuth();
+    const welcomeName = userProfile?.name?.split(' ')[0] || currentUser?.displayName || currentUser?.email?.split('@')[0] || '';
+
     const handleContact = () => {
         const phone = "551938623362";
         const text = encodeURIComponent("Estou no aplicativo e gostaria de saber mais");
@@ -24,36 +28,27 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                 src="images/brand/logo-red.svg"
                 alt="Kóche"
                 className="app-logo"
-                style={{ maxWidth: '280px', marginBottom: '3rem' }}
+                style={{ height: '100px', marginBottom: '0rem' }}
             />
 
-            <div className="card" style={{ maxWidth: '400px', width: '100%', textAlign: 'center', padding: '3rem 2rem' }}>
-                <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', textTransform: 'uppercase', color: 'var(--koche-blue)' }}>Bem-vindo</h2>
+            <div className="card" style={{ maxWidth: '400px', width: '100%', textAlign: 'center', padding: '2rem 2rem' }}>
+                <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', textTransform: 'uppercase', color: 'var(--koche-blue)' }}>Bem-vindo, {welcomeName}</h2>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {/* BOTÃO GUIA (Primary Action) */}
                     <button
                         onClick={onStartGuide}
                         className="btn-primary" // Uses Blue
-                        style={{ padding: '1.25rem' }}
+                        style={{ padding: '1.25rem', textTransform: 'uppercase' }}
                     >
-                        <BookOpen size={24} /> Acessar Guia
-                    </button>
-
-                    {/* BOTÃO ASSISTENTE (Secondary Action) */}
-                    <button
-                        onClick={onStartAssistant}
-                        className="btn-elevated"
-                        style={{ padding: '1.25rem', color: 'var(--koche-blue)', border: '1px solid var(--koche-blue)' }}
-                    >
-                        <Bot size={24} /> Assistente Virtual
+                        <BookOpen size={24} /> Acessar Guia de Transmissão
                     </button>
 
                     {/* BOTÃO CURSO (Secondary Action) */}
                     <button
                         onClick={onStartCourse}
                         className="btn-elevated" // White elevated
-                        style={{ padding: '1.25rem' }}
+                        style={{ padding: '1.25rem', border: '1px solid var(--koche-blue)' }}
                     >
                         <GraduationCap size={24} /> Acessar Curso
                     </button>
@@ -68,24 +63,36 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                     </button>
 
                     {/* Spacer */}
-                    <div style={{ height: '0.5rem' }}></div>
+                    <div style={{ height: '0.2rem' }}></div>
 
-                    {/* BOTÃO MINHA CONTA (Profile) */}
+                    {/* BOTÃO ASSISTENTE (Secondary Action) */}
                     <button
-                        onClick={onProfile}
+                        onClick={onStartAssistant}
                         className="btn-elevated"
-                        style={{ padding: '1rem', color: 'var(--text-primary)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-dark)' }}
+                        style={{ padding: '1.25rem', color: 'var(--koche-blue)', border: '1px solid var(--koche-blue)' }}
                     >
-                        <User size={20} /> Minha Conta
+                        <Bot size={24} /> Assistente Virtual
                     </button>
 
                     {/* BOTÃO CONTATO (Support) */}
                     <button
                         onClick={handleContact}
-                        className="btn-outlined"
-                        style={{ justifyContent: 'center' }}
+                        className="btn-elevated"
+                        style={{ padding: '1.25rem', color: 'var(--koche-blue)', justifyContent: 'center', border: '1px solid var(--koche-blue)' }}
                     >
                         <MessageCircle size={20} color="#25D366" /> Entrar em Contato
+                    </button>
+
+                    {/* Spacer */}
+                    <div style={{ height: '0.2rem' }}></div>
+
+                    {/* BOTÃO MINHA CONTA (Profile) */}
+                    <button
+                        onClick={onProfile}
+                        className="btn-elevated"
+                        style={{ padding: '1.25rem', color: 'var(--text-primary)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-dark)', border: '1px solid var(--koche-blue)' }}
+                    >
+                        <User size={20} /> Minha Conta
                     </button>
 
                     {/* ADMIN BUTTON (Visible only to Admin) */}
@@ -105,8 +112,8 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                 </div>
             </div>
 
-            <div style={{ marginTop: '2.5rem', maxWidth: '600px', textAlign: 'center', padding: '0 1.5rem' }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+            <div style={{ marginTop: '2.5rem', maxWidth: '440px', textAlign: 'justify', padding: '0 1.5rem' }}>
+                <p style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
                     <strong style={{ color: 'var(--koche-red)' }}>Aviso Legal:</strong> As informações e imagens apresentadas neste aplicativo têm caráter informativo e podem não se aplicar a todos os veículos ou situações. O procedimento correto deve sempre ser confirmado no manual do fabricante do veículo. A execução do serviço é de responsabilidade do profissional que o realiza.
                 </p>
             </div>

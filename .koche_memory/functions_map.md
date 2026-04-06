@@ -1,26 +1,50 @@
 # Mapa de Funções e Componentes
 
-Mapeamento técnico da estrutura interna do App Kóche.
+Mapeamento técnico das peças que realmente controlam fluxo, dados e efeitos colaterais do App Kóche.
+
+## Entrypoints
+
+- `src/main.jsx`: bootstrap React e limpeza forçada de service workers.
+- `src/App.jsx`: navegação por `currentView`, preload de base para o assistente e guards de autenticação/perfil.
+
+## Contexto E Fluxo De Autenticação
+
+- `src/contexts/AuthContext.jsx`
+  - expõe `currentUser`, `userProfile`, `isAdmin`, `loading` e ações de auth/perfil.
+  - resolve admin por email hardcoded ou coleção `admins` no Firestore.
+  - carrega perfil da coleção `users`.
+  - `updateProfileData()` faz merge no Firestore, atualiza `displayName` no Auth e dispara integração de lead se houver `phone`.
 
 ## Componentes Principais (`src/components`)
 
-- `WelcomeScreen.jsx`: Tela inicial com opções de Guia e Assistente.
-- `Selector.jsx`: Componente de dropdown personalizado para seleção de marcas e modelos.
-- `ResultCard.jsx`: Exibe os detalhes técnicos do veículo selecionado (fluido, fotos, vídeo).
-- `AssistantScreen.jsx`: Interface de chat com o assistente de IA.
-- `AdminScreen.jsx`: Painel administrativo para gerenciamento de dados e usuários.
-- `Login.jsx`: Tela de autenticação para as áreas restritas.
-- `ErrorBoundary.jsx`: Tratamento de erros globais da aplicação.
+- `Login.jsx`: login com Google, email/senha e criação de conta.
+- `ProfileForm.jsx`: gate obrigatório de telefone; salvar telefone destrava o restante do app.
+- `WelcomeScreen.jsx`: hub principal de navegação após autenticação.
+- `Dashboard.jsx`: fluxo guia Marca -> Modelo -> Ano -> Motor usando `fetchVehicleData()`.
+- `ResultCard.jsx`: renderiza dados do veículo e faz fallback entre chaves novas (`snake_case`) e antigas (`camelCase`).
+- `AssistantScreen.jsx`: chat simples; hoje só exibe a mensagem textual retornada pela IA.
+- `AdminScreen.jsx`: CRUD de veículos, gestão de admins e exportação CSV de leads.
+- `UserArea.jsx`: edição de nome/telefone e logout; reutiliza `updateProfileData()`.
+- `CourseScreen.jsx`: catálogo de vídeos local, sem backend.
+- `ErrorBoundary.jsx`: proteção global contra crash de render.
 
 ## Serviços (`src/services`)
 
-- `aiService.js`: Gerencia a comunicação com a API do Google Generative AI (Gemini).
-- `dataService.js`: Lógica de busca e filtragem na base de dados JSON.
-- `firebase.js`: Configuração e instâncias do Firebase (Auth/Firestore).
-- `leads.js`: Serviço para captura e gerenciamento de leads.
+- `firebase.js`: inicialização do Firebase com configuração hardcoded.
+- `dataService.js`
+  - fonte real: coleção `vehicles` no Firestore.
+  - cache local de 24h em `koche_vehicle_data_v1`.
+  - CRUD de veículos limpa cache.
+  - também centraliza admins, busca/export de usuários e normalização de URLs de imagem/vídeo.
+- `aiService.js`
+  - usa `VITE_GEMINI_API_KEY`.
+  - envia dataset compactado para o Gemini.
+  - espera JSON puro com `message`, `action` e `target`.
+- `leads.js`: POST para webhook externo; falha não bloqueia UX.
 
-## Utilitários e Contextos
+## Fluxos Que Costumam Gerar Erro Em Mudanças
 
-- `contexts/AuthContext.js`: Fornece o estado de autenticação para toda a aplicação.
-- `App.jsx`: Componente raiz gerenciando o roteamento e o estado global da navegação.
-- `Data_Carros_Koche_App.json`: A "fonte da verdade" para os dados técnicos.
+- Refresh da página não preserva destino interno; como não há router, o app volta ao fluxo padrão após reavaliar auth/perfil.
+- `App.jsx` e `Dashboard.jsx` carregam veículos separadamente; o cache reduz custo, mas há duplicação de fetch.
+- `UserArea.jsx` pode disparar lead duplicado ao editar telefone porque usa a mesma rotina do gate inicial.
+- `AssistantScreen.jsx` ainda não usa `action/target`; mudar `aiService.js` sem ligar a UI pode não ter efeito funcional.
