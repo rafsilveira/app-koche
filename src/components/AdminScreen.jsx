@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { addVehicle, getAdmins, addAdmin, removeAdmin, searchUsers, getAllUsers, updateVehicle, deleteVehicle, fetchVehicleData } from '../services/dataService';
-import { ChevronLeft, ChevronDown, ChevronUp, Database, Plus, Save, AlertTriangle, CheckCircle, Users, Trash, Download, Search, Edit, X } from 'lucide-react';
+import { clearLearningPlatformData, seedLearningPlatformData } from '../services/learningService';
+import { ChevronLeft, ChevronDown, ChevronUp, Database, Plus, Save, AlertTriangle, CheckCircle, Users, Trash, Download, Search, Edit, X, GraduationCap } from 'lucide-react';
 import './AdminScreen.css';
 import PropTypes from 'prop-types';
 
@@ -28,7 +29,7 @@ export default function AdminScreen({ onBack }) {
     });
 
     // TAB STATE
-    const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' | 'admins'
+    const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' | 'admins' | 'learning' | 'leads'
 
     const [activeSection, setActiveSection] = useState(null); // 'add' | 'edit'
 
@@ -107,6 +108,36 @@ export default function AdminScreen({ onBack }) {
             fetchAdmins();
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const handleSeedLearningPlatform = async () => {
+        if (!confirm('Adicionar os modulos e aulas placeholder da plataforma de ensino no Firestore sem apagar os dados atuais?')) return;
+
+        setLoading(true);
+        try {
+            await seedLearningPlatformData();
+            setMsg({ type: 'success', text: 'Plataforma de ensino populada com placeholders no Firestore.' });
+        } catch (error) {
+            console.error(error);
+            setMsg({ type: 'error', text: `Erro ao popular a plataforma de ensino no Firestore: ${error.code || error.message || 'erro desconhecido'}` });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleClearLearningPlatform = async () => {
+        if (!confirm('Tem certeza que deseja apagar todos os registros da coleção learning_modules e de suas subcoleções lessons? Esta ação é irreversível.')) return;
+
+        setLoading(true);
+        try {
+            await clearLearningPlatformData();
+            setMsg({ type: 'success', text: 'Coleção learning_modules e subcoleções lessons removidas com sucesso.' });
+        } catch (error) {
+            console.error(error);
+            setMsg({ type: 'error', text: `Erro ao apagar a plataforma de ensino no Firestore: ${error.code || error.message || 'erro desconhecido'}` });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -495,6 +526,20 @@ export default function AdminScreen({ onBack }) {
                 >
                     <Download size={18} /> Leads (Exportar)
                 </button>
+                <button
+                    onClick={() => setActiveTab('learning')}
+                    style={{
+                        padding: '1rem',
+                        background: 'transparent',
+                        border: 'none',
+                        color: activeTab === 'learning' ? 'var(--koche-red)' : '#666',
+                        borderBottom: activeTab === 'learning' ? '2px solid var(--koche-red)' : 'none',
+                        cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: '0.5rem'
+                    }}
+                >
+                    <GraduationCap size={18} /> Plataforma de Ensino
+                </button>
             </div>
 
             {/* MESSAGE TOAST */}
@@ -729,6 +774,30 @@ export default function AdminScreen({ onBack }) {
                                 )}
                             </div>
                         )}
+                    </div>
+                </>
+            ) : activeTab === 'learning' ? (
+                <>
+                    <div className="card">
+                        <h3 style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}>
+                            <GraduationCap size={20} /> Plataforma de Ensino
+                        </h3>
+                        <p style={{ color: '#ccc', marginBottom: '1rem', lineHeight: '1.6' }}>
+                            Gerencie os dados de teste da nova plataforma de ensino diretamente no Firestore.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                            <button
+                                onClick={handleClearLearningPlatform}
+                                className="btn-elevated"
+                                disabled={loading}
+                                style={{ justifyContent: 'center', background: 'rgba(255, 68, 68, 0.12)', color: '#ff6b6b', border: '1px solid #ff6b6b' }}
+                            >
+                                {loading ? 'Processando...' : 'Apagar Colecao Learning Modules'}
+                            </button>
+                            <button onClick={handleSeedLearningPlatform} className="btn-primary" disabled={loading} style={{ justifyContent: 'center' }}>
+                                {loading ? 'Processando...' : 'Popular Firestore da Plataforma de Ensino'}
+                            </button>
+                        </div>
                     </div>
                 </>
             ) : (

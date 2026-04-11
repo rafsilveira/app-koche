@@ -26,8 +26,8 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    // ADMIN EMAIL
-    const ADMIN_EMAIL = "rafsilveira@gmail.com";
+    // ADMIN EMAILS
+    const ADMIN_EMAILS = ["rafsilveira@gmail.com", "jvmantovani@gmail.com"];
 
     // Sign in with Google
     const loginGoogle = async () => {
@@ -152,7 +152,7 @@ export function AuthProvider({ children }) {
             setCurrentUser(user);
             if (user) {
                 // Check Admin (Hardcoded OR Firestore)
-                let isAdminUser = user.email === ADMIN_EMAIL;
+                let isAdminUser = ADMIN_EMAILS.includes(user.email);
 
                 if (!isAdminUser) {
                     // Check Firestore 'admins' collection

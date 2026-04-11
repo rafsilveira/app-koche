@@ -23,9 +23,10 @@ Mapeamento técnico das peças que realmente controlam fluxo, dados e efeitos co
 - `Dashboard.jsx`: fluxo guia Marca -> Modelo -> Ano -> Motor usando `fetchVehicleData()`.
 - `ResultCard.jsx`: renderiza dados do veículo e faz fallback entre chaves novas (`snake_case`) e antigas (`camelCase`).
 - `AssistantScreen.jsx`: chat simples; hoje só exibe a mensagem textual retornada pela IA.
+- `CourseScreen.jsx`: módulo legado de videoaulas grátis com lista local de vídeos.
+- `LearningPlatformScreen.jsx`: nova plataforma de ensino; navega entre módulos, aulas e detalhe da aula usando dados do Firestore.
 - `AdminScreen.jsx`: CRUD de veículos, gestão de admins e exportação CSV de leads.
 - `UserArea.jsx`: edição de nome/telefone e logout; reutiliza `updateProfileData()`.
-- `CourseScreen.jsx`: catálogo de vídeos local, sem backend.
 - `ErrorBoundary.jsx`: proteção global contra crash de render.
 
 ## Serviços (`src/services`)
@@ -41,6 +42,10 @@ Mapeamento técnico das peças que realmente controlam fluxo, dados e efeitos co
   - envia dataset compactado para o Gemini.
   - espera JSON puro com `message`, `action` e `target`.
 - `leads.js`: POST para webhook externo; falha não bloqueia UX.
+- `learningService.js`
+  - lê módulos na coleção `learning_modules`.
+  - lê aulas em subcoleções `learning_modules/{moduleId}/lessons`.
+  - oferece seed de placeholders para popular rapidamente a nova plataforma.
 
 ## Fluxos Que Costumam Gerar Erro Em Mudanças
 
@@ -48,3 +53,4 @@ Mapeamento técnico das peças que realmente controlam fluxo, dados e efeitos co
 - `App.jsx` e `Dashboard.jsx` carregam veículos separadamente; o cache reduz custo, mas há duplicação de fetch.
 - `UserArea.jsx` pode disparar lead duplicado ao editar telefone porque usa a mesma rotina do gate inicial.
 - `AssistantScreen.jsx` ainda não usa `action/target`; mudar `aiService.js` sem ligar a UI pode não ter efeito funcional.
+- A plataforma nova e o módulo antigo de vídeo coexistem; não trate `CourseScreen.jsx` e `LearningPlatformScreen.jsx` como a mesma feature.

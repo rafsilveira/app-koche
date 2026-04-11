@@ -36,7 +36,6 @@ export default function CourseScreen({ onBack }) {
 
     return (
         <div className="container" style={{ maxWidth: '900px' }}>
-            {/* Header da Seção */}
             <div className="app-header" style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <button onClick={onBack} className="btn-outlined" style={{ padding: '8px 12px' }}>
@@ -44,15 +43,14 @@ export default function CourseScreen({ onBack }) {
                     </button>
                 </div>
                 <h2>Treinamento Kóche</h2>
-                <div style={{ width: '80px' }}></div> {/* Spacer for alignment */}
+                <div style={{ width: '80px' }}></div>
             </div>
 
-            {/* Player de Vídeo (Se selecionado) */}
             {selectedVideo && (
                 <div className="card" style={{ marginBottom: '2rem', padding: '1.5rem', borderLeft: '4px solid var(--koche-blue)' }}>
                     <div className="video-container" style={{
                         position: 'relative',
-                        paddingBottom: '56.25%', /* 16:9 */
+                        paddingBottom: '56.25%',
                         height: 0,
                         background: '#000',
                         borderRadius: 'var(--radius-sm)',
@@ -81,7 +79,6 @@ export default function CourseScreen({ onBack }) {
                 </div>
             )}
 
-            {/* Lista de Aulas */}
             <div className="course-list" style={{ display: 'grid', gap: '1rem' }}>
                 {COURSES.map(course => (
                     <div
@@ -99,7 +96,6 @@ export default function CourseScreen({ onBack }) {
                             border: course.id === selectedVideo?.id ? '2px solid var(--koche-blue)' : '1px solid var(--koche-silver)'
                         }}
                     >
-                        {/* Thumbnail */}
                         <div style={{
                             width: '140px',
                             height: '80px',
@@ -146,7 +142,6 @@ export default function CourseScreen({ onBack }) {
                             )}
                         </div>
 
-                        {/* Info */}
                         <div style={{ flex: 1 }}>
                             <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem', color: course.isComingSoon ? 'gray' : 'var(--koche-blue)' }}>
                                 {course.title}

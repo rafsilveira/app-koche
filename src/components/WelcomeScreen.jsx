@@ -1,8 +1,8 @@
-import { BookOpen, GraduationCap, MessageCircle, Bot, Download, User } from 'lucide-react';
+import { BookOpen, GraduationCap, MessageCircle, Bot, Download, User, Settings } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
 
-function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin, onProfile, isAdmin }) {
+function WelcomeScreen({ onStartGuide, onStartCourse, onStartLearningPlatform, onStartAssistant, onAdmin, onProfile, isAdmin }) {
     const { currentUser, userProfile } = useAuth();
     const welcomeName = userProfile?.name?.split(' ')[0] || currentUser?.displayName || currentUser?.email?.split('@')[0] || '';
 
@@ -44,14 +44,24 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                         <BookOpen size={24} /> Acessar Guia de Transmissão
                     </button>
 
-                    {/* BOTÃO CURSO (Secondary Action) */}
+                    {/* BOTÃO VIDEOAULAS GRATIS */}
                     <button
                         onClick={onStartCourse}
                         className="btn-elevated" // White elevated
                         style={{ padding: '1.25rem', border: '1px solid var(--koche-blue)' }}
                     >
-                        <GraduationCap size={24} /> Acessar Curso
+                        <GraduationCap size={24} /> Videoaulas Gratis
                     </button>
+
+                    {isAdmin && (
+                        <button
+                            onClick={onStartLearningPlatform}
+                            className="btn-elevated"
+                            style={{ padding: '1.25rem', color: 'var(--koche-blue)', border: '1px solid var(--koche-blue)' }}
+                        >
+                            <GraduationCap size={24} /> PLATAFORMA DE ENSINO
+                        </button>
+                    )}
 
                     {/* BOTÃO EBOOK (New Action) */}
                     <button
@@ -90,7 +100,7 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                     <button
                         onClick={onProfile}
                         className="btn-elevated"
-                        style={{ padding: '1.25rem', color: 'var(--text-primary)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-dark)', border: '1px solid var(--koche-blue)' }}
+                        style={{ padding: '1.25rem', color: 'var(--text-primary)', backgroundColor: 'var(--bg-dark)', border: '1px solid var(--koche-blue)' }}
                     >
                         <User size={20} /> Minha Conta
                     </button>
@@ -98,13 +108,12 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                     {/* ADMIN BUTTON (Visible only to Admin) */}
                     {isAdmin && (
                         <>
-                            <div style={{ height: '0.5rem' }}></div>
                             <button
                                 onClick={onAdmin}
-                                className="btn-outlined"
-                                style={{ justifyContent: 'center', borderColor: '#333', color: '#666' }}
+                                className="btn-elevated"
+                                style={{ padding: '1.25rem', color: 'var(--koche-blue)', border: '1px solid var(--koche-blue)' }}
                             >
-                                Painel Admin
+                                <Settings size={20} /> PAINEL ADMIN
                             </button>
                         </>
                     )}
@@ -124,6 +133,7 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
 WelcomeScreen.propTypes = {
     onStartGuide: PropTypes.func.isRequired,
     onStartCourse: PropTypes.func.isRequired,
+    onStartLearningPlatform: PropTypes.func.isRequired,
     onStartAssistant: PropTypes.func.isRequired,
     onAdmin: PropTypes.func.isRequired,
     onProfile: PropTypes.func.isRequired,

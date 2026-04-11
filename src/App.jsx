@@ -5,6 +5,7 @@ import ProfileForm from './components/ProfileForm'
 import ErrorBoundary from './components/ErrorBoundary'
 import { fetchVehicleData } from './services/dataService'
 import CourseScreen from './components/CourseScreen'
+import LearningPlatformScreen from './components/LearningPlatformScreen'
 import AssistantScreen from './components/AssistantScreen';
 import AdminScreen from './components/AdminScreen';
 import Dashboard from './components/Dashboard';
@@ -13,7 +14,7 @@ import UserArea from './components/UserArea';
 
 function AppContent() {
   const { currentUser, userProfile, isAdmin } = useAuth();
-  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'assistant' | 'admin' | 'profile'
+  const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'learning-platform' | 'assistant' | 'admin' | 'profile'
 
   // Also load database here to pass to Assistant? Or let Assistant fetch it?
   // Ideally, AssistantScreen fetches, but it's small enough to share if logical.
@@ -40,12 +41,13 @@ function AppContent() {
   // ROUTING
   if (currentView === 'welcome') {
     return (
-      <WelcomeScreen
-        onStartGuide={() => setCurrentView('guide')}
-        onStartCourse={() => setCurrentView('course')}
-        onStartAssistant={() => setCurrentView('assistant')}
-        onAdmin={() => setCurrentView('admin')}
-        onProfile={() => setCurrentView('profile')}
+        <WelcomeScreen
+          onStartGuide={() => setCurrentView('guide')}
+          onStartCourse={() => setCurrentView('course')}
+          onStartLearningPlatform={() => setCurrentView('learning-platform')}
+          onStartAssistant={() => setCurrentView('assistant')}
+          onAdmin={() => setCurrentView('admin')}
+          onProfile={() => setCurrentView('profile')}
         isAdmin={isAdmin}
       />
     );
@@ -53,6 +55,10 @@ function AppContent() {
 
   if (currentView === 'course') {
     return <CourseScreen onBack={() => setCurrentView('welcome')} />;
+  }
+
+  if (currentView === 'learning-platform') {
+    return <LearningPlatformScreen onBack={() => setCurrentView('welcome')} />;
   }
 
   if (currentView === 'assistant') {

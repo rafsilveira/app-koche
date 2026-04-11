@@ -13,7 +13,7 @@ O **App Kóche** é uma aplicação React + Vite para consulta técnica de trans
 1. Usuário sem sessão autenticada vê `Login`.
 2. Usuário autenticado sem `userProfile.phone` é forçado para `ProfileForm`.
 3. Só depois disso o app libera `WelcomeScreen` e os destinos internos.
-4. A partir de `WelcomeScreen`, `currentView` leva para `Dashboard`, `CourseScreen`, `AssistantScreen`, `UserArea` e `AdminScreen`.
+4. A partir de `WelcomeScreen`, `currentView` leva para `Dashboard`, `CourseScreen`, `LearningPlatformScreen`, `AssistantScreen`, `UserArea` e `AdminScreen`.
 
 ## Fonte De Verdade E Persistência
 
@@ -28,6 +28,7 @@ O **App Kóche** é uma aplicação React + Vite para consulta técnica de trans
 - `src/services/dataService.js`: leitura/cache de veículos, CRUD administrativo, busca/export de usuários e normalização de links de mídia.
 - `src/services/aiService.js`: integração Gemini via `VITE_GEMINI_API_KEY`, enviando o dataset completo como contexto.
 - `src/services/leads.js`: envio não bloqueante de leads para webhook externo.
+- `src/services/learningService.js`: leitura de módulos e aulas da plataforma de ensino no Firestore e seed de placeholders para `learning_modules/{moduleId}/lessons`.
 
 ## Restrições Importantes
 
@@ -35,3 +36,4 @@ O **App Kóche** é uma aplicação React + Vite para consulta técnica de trans
 - O suporte PWA está desativado na prática: plugin comentado em `vite.config.js`, unregister em `src/main.jsx` e `public/sw.js` autodestrutivo.
 - `updateProfileData()` envia lead externo quando recebe `phone`; editar a conta depois pode gerar envios duplicados.
 - O assistente hoje só renderiza `response.message`; ações estruturadas como `SELECT_VEHICLE` ainda não estão conectadas à UI.
+- O módulo antigo de `CourseScreen` continua sendo um bloco separado de videoaulas grátis hardcoded; a nova plataforma de ensino fica em `LearningPlatformScreen` e lê do Firestore.
