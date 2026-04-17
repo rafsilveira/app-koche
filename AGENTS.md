@@ -11,6 +11,7 @@
 - `npm run build:beta` generates the beta bundle in `dist/app-beta` with base `/app-beta/`.
 - Deploy helpers: `npm run deploy:app` and `npm run deploy:beta`.
 - FTP troubleshooting helper: `node debug_ftp.js app` or `node debug_ftp.js beta`.
+- During normal development, prefer `npm run dev` and `npm run build:beta`; only build production with `npm run build:app` when the user explicitly asks for it.
 - `npm run lint` currently fails on pre-existing repo issues, including Node-side helper scripts being linted with browser globals plus existing app errors (`ResultCard.jsx`, `WelcomeScreen.jsx`, etc.). Do not assume lint is a clean gate before your change.
 
 ## Data And Backend Truths
