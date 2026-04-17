@@ -7,9 +7,10 @@
 
 ## Verified Commands
 - `npm run dev` starts the Vite dev server.
-- `npm run build` is the main reliable verification step.
-- Deploy is not an npm script: run `npm run build` then `node deploy.js`.
-- FTP troubleshooting helper: `node debug_ftp.js`.
+- `npm run build` and `npm run build:app` generate the production bundle in `dist/app` with base `/app/`.
+- `npm run build:beta` generates the beta bundle in `dist/app-beta` with base `/app-beta/`.
+- Deploy helpers: `npm run deploy:app` and `npm run deploy:beta`.
+- FTP troubleshooting helper: `node debug_ftp.js app` or `node debug_ftp.js beta`.
 - `npm run lint` currently fails on pre-existing repo issues, including Node-side helper scripts being linted with browser globals plus existing app errors (`ResultCard.jsx`, `WelcomeScreen.jsx`, etc.). Do not assume lint is a clean gate before your change.
 
 ## Data And Backend Truths
@@ -22,11 +23,12 @@
 
 ## Env And Secrets
 - Gemini uses `VITE_GEMINI_API_KEY` from Vite env. `.env.example` does not mention it.
-- FTP deploy uses `FTP_HOST`, `FTP_USER`, `FTP_PASSWORD`, `FTP_PORT`, and optional `REMOTE_PATH` from `.env`.
+- FTP deploy uses `FTP_HOST`, `FTP_USER`, `FTP_PASSWORD`, `FTP_PORT`, plus `REMOTE_PATH_APP` and `REMOTE_PATH_BETA` in `.env`.
 - Firebase config is currently hardcoded in `src/services/firebase.js`, so changing Firebase projects is a code change, not an env-only change.
 
 ## Hosting And PWA Quirks
-- The app is built for the subpath `/guia-de-aplicacao/` via `vite.config.js`. Keep asset paths and links compatible with that base path.
+- The app base path is mode-driven in `vite.config.js`: development/beta uses `/app-beta/`, production uses `/app/`.
+- Avoid hard-coded absolute asset paths in app code; prefer Vite-managed relative paths or `import.meta.env.BASE_URL`.
 - PWA behavior is currently disabled in practice: `VitePWA(...)` is commented out in `vite.config.js`, `src/main.jsx` unregisters all service workers on load, and `public/sw.js` unregisters itself on activation.
 - If a task mentions offline installability or manifest behavior, inspect all three places above before assuming PWA support is active.
 

@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const target = process.argv[2] || 'app';
+
 const config = {
     host: process.env.FTP_HOST?.replace(/^ftp:\/\/|^sftp:\/\//, ''),
     user: process.env.FTP_USER,
@@ -10,6 +12,16 @@ const config = {
     port: parseInt(process.env.FTP_PORT || 21),
     secure: false
 };
+
+const targetPath = {
+    app: process.env.REMOTE_PATH_APP || process.env.REMOTE_PATH || '/domains/kocheautomotiva.com.br/public_html/app',
+    beta: process.env.REMOTE_PATH_BETA || '/domains/kocheautomotiva.com.br/public_html/app-beta'
+}[target];
+
+if (!targetPath) {
+    console.error(`❌ Invalid debug target: ${target}. Use "app" or "beta".`);
+    process.exit(1);
+}
 
 async function checkRemote() {
     const client = new ftp.Client();
@@ -25,15 +37,8 @@ async function checkRemote() {
 
         console.log('PWD:', await client.pwd());
 
-        const pathsToCheck = [
-            '/public_html/guia-de-aplicacao/assets',
-            '/public_html/assets',
-            '/public_html/guia-aplicacao-transmissao/assets'
-        ];
-
-        const p = '/public_html/guia-de-aplicacao';
-        console.log(`\n🔎 Checking: ${p}`);
-        await client.downloadTo('server_index.html', `${p}/index.html`);
+        console.log(`\n🔎 Checking: ${targetPath}`);
+        await client.downloadTo('server_index.html', `${targetPath}/index.html`);
         console.log('✅ Downloaded server_index.html');
 
     } catch (err) {

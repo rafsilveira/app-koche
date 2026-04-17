@@ -32,7 +32,7 @@ O **App Kóche** é uma aplicação React + Vite para consulta técnica de trans
 
 ## Restrições Importantes
 
-- O app é hospedado no subcaminho `/guia-de-aplicacao/`; links absolutos e assets precisam respeitar esse `base`.
+- O `base` do Vite agora varia por modo: produção usa `/app/` e beta/desenvolvimento usa `/app-beta/`; links absolutos devem usar `import.meta.env.BASE_URL` quando precisarem respeitar o subcaminho.
 - O suporte PWA está desativado na prática: plugin comentado em `vite.config.js`, unregister em `src/main.jsx` e `public/sw.js` autodestrutivo.
 - `updateProfileData()` envia lead externo quando recebe `phone`; editar a conta depois pode gerar envios duplicados.
 - O assistente hoje só renderiza `response.message`; ações estruturadas como `SELECT_VEHICLE` ainda não estão conectadas à UI.

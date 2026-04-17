@@ -13,7 +13,7 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartLearningPlatform, o
     };
 
     const handleDownloadEbook = () => {
-        const ebookUrl = '/guia-de-aplicacao/ebooks/troca-fluido-transmissao.pdf';
+        const ebookUrl = `${import.meta.env.BASE_URL}ebooks/troca-fluido-transmissao.pdf`;
         const link = document.createElement('a');
         link.href = ebookUrl;
         link.download = 'troca-fluido-transmissao-koche.pdf';

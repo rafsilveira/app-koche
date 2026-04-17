@@ -5,7 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:app",
+    "build:app": "vite build --mode production",
+    "build:beta": "vite build --mode beta",
+    "build:all": "npm run build:app && npm run build:beta",
+    "deploy:app": "npm run build:app && node deploy.js app",
+    "deploy:beta": "npm run build:beta && node deploy.js beta",
     "lint": "eslint .",
     "preview": "vite preview"
   },

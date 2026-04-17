@@ -44,7 +44,7 @@ E selecionar o 17 como padrão com `archlinux-java` se necessário, mas tente ro
 
 2.  Inicie o processo usando **npx**:
     ```bash
-    npx @bubblewrap/cli init --manifest http://kocheautomotiva.com.br/guia-de-aplicacao/manifest.json
+    npx @bubblewrap/cli init --manifest http://kocheautomotiva.com.br/app/manifest.json
     ```
 
 3.  Responda o questionário:
@@ -52,7 +52,7 @@ E selecionar o 17 como padrão com `archlinux-java` se necessário, mas tente ro
     *   **Application Name**: Guia de Aplicação Kóche
     *   **Short Name**: Guia Kóche
     *   **Application ID**: `br.com.kocheautomotiva.guia` (Exemplo)
-    *   **Start URL**: `/guia-de-aplicacao/`
+    *   **Start URL**: `/app/`
     *   **Display Mode**: Standalone/Fullscreen
     *   **Key Store**: Deixe ele criar uma nova. **GUARDE PASTA DE CHAVES E SENHAS!**
 
