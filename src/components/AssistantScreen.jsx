@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, ChevronLeft, Bot, Loader2, Info } from 'lucide-react';
-import { sendMessageToAI } from '../services/aiService';
+import { Send, ChevronLeft, Loader2, ExternalLink } from 'lucide-react';
+import { sendAssistantMessage } from '../services/assistantService';
 
-export default function AssistantScreen({ onBack, database }) {
+export default function AssistantScreen({ onBack, onOpenGuide }) {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([
-        { role: 'assistant', text: 'Olá! Sou a IA da Kóche. Em breve estarei pronta para tirar todas as suas dúvidas sobre transmissões.' }
+        {
+            role: 'assistant',
+            type: 'faq',
+            text: 'Posso ajudar com informacoes sobre a Koche e localizar resultados do Guia de Transmissao. Informe marca, modelo, ano e motor do veiculo quando quiser consultar o guia.',
+            guideAction: null
+        }
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
@@ -28,10 +33,22 @@ export default function AssistantScreen({ onBack, database }) {
         setIsLoading(true);
 
         try {
-            const response = await sendMessageToAI(userMsg, database);
-            setMessages(prev => [...prev, { role: 'assistant', text: response.message }]);
+            const response = await sendAssistantMessage(userMsg);
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                type: response.type,
+                text: response.message,
+                guideAction: response.guideAction,
+                missingFields: response.missingFields,
+                usage: response.usage
+            }]);
         } catch (error) {
-            setMessages(prev => [...prev, { role: 'assistant', text: 'Desculpe, ocorreu um erro de conexão.' }]);
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                type: 'error',
+                text: 'Desculpe, ocorreu um erro de conexao.',
+                guideAction: null
+            }]);
         } finally {
             setIsLoading(false);
         }
@@ -81,7 +98,16 @@ export default function AssistantScreen({ onBack, database }) {
                         borderBottomRightRadius: msg.role === 'user' ? '2px' : '12px',
                         borderBottomLeftRadius: msg.role === 'assistant' ? '2px' : '12px',
                     }}>
-                        {msg.text}
+                        <div>{msg.text}</div>
+                        {msg.role === 'assistant' && msg.guideAction && (
+                            <button
+                                onClick={() => onOpenGuide?.(msg.guideAction)}
+                                className="btn-primary"
+                                style={{ marginTop: '0.75rem', width: '100%', justifyContent: 'center' }}
+                            >
+                                <ExternalLink size={16} /> {msg.guideAction.label || 'Abrir no Guia'}
+                            </button>
+                        )}
                     </div>
                 ))}
                 {isLoading && (

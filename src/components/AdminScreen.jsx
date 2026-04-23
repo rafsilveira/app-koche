@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { addVehicle, getAdmins, addAdmin, removeAdmin, searchUsers, getAllUsers, updateVehicle, deleteVehicle, fetchVehicleData } from '../services/dataService';
 import { clearLearningPlatformData, seedLearningPlatformData } from '../services/learningService';
-import { ChevronLeft, ChevronDown, ChevronUp, Database, Plus, Save, AlertTriangle, CheckCircle, Users, Trash, Download, Search, Edit, X, GraduationCap } from 'lucide-react';
+import { getAssistantUserSettings, saveAssistantUserSettings, DEFAULT_ASSISTANT_SETTINGS } from '../services/adminAssistantService';
+import { ChevronLeft, ChevronDown, ChevronUp, Database, Plus, Save, AlertTriangle, CheckCircle, Users, Trash, Download, Search, Edit, X, GraduationCap, Bot } from 'lucide-react';
 import './AdminScreen.css';
 import PropTypes from 'prop-types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function AdminScreen({ onBack }) {
+    const { currentUser } = useAuth();
 
     // Form State
     const [formData, setFormData] = useState({
@@ -29,7 +32,7 @@ export default function AdminScreen({ onBack }) {
     });
 
     // TAB STATE
-    const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' | 'admins' | 'learning' | 'leads'
+    const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' | 'admins' | 'assistant' | 'learning' | 'leads'
 
     const [activeSection, setActiveSection] = useState(null); // 'add' | 'edit'
 
@@ -41,6 +44,13 @@ export default function AdminScreen({ onBack }) {
     // User Search State
     const [userSuggestions, setUserSuggestions] = useState([]);
     const [searchingUsers, setSearchingUsers] = useState(false);
+
+    const [assistantUserQuery, setAssistantUserQuery] = useState('');
+    const [assistantUserSuggestions, setAssistantUserSuggestions] = useState([]);
+    const [searchingAssistantUsers, setSearchingAssistantUsers] = useState(false);
+    const [selectedAssistantUser, setSelectedAssistantUser] = useState(null);
+    const [assistantSettings, setAssistantSettings] = useState(DEFAULT_ASSISTANT_SETTINGS);
+    const [loadingAssistantSettings, setLoadingAssistantSettings] = useState(false);
 
     // Load Admins on mount or tab switch
     useEffect(() => {
@@ -108,6 +118,78 @@ export default function AdminScreen({ onBack }) {
             fetchAdmins();
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const handleAssistantSearchChange = async (e) => {
+        const val = e.target.value;
+        setAssistantUserQuery(val);
+        setSelectedAssistantUser(null);
+
+        if (val.length >= 3) {
+            setSearchingAssistantUsers(true);
+            try {
+                const results = await searchUsers(val);
+                setAssistantUserSuggestions(results);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setSearchingAssistantUsers(false);
+            }
+        } else {
+            setAssistantUserSuggestions([]);
+        }
+    };
+
+    const handleSelectAssistantUser = async (user) => {
+        setAssistantUserQuery(user.email);
+        setAssistantUserSuggestions([]);
+        setSelectedAssistantUser(user);
+        setLoadingAssistantSettings(true);
+
+        try {
+            const settings = await getAssistantUserSettings(user.id);
+            setAssistantSettings({
+                enabled: settings.enabled,
+                dailyRequestLimit: settings.dailyRequestLimit,
+                monthlyRequestLimit: settings.monthlyRequestLimit,
+                dailyTokenLimit: settings.dailyTokenLimit,
+                monthlyTokenLimit: settings.monthlyTokenLimit,
+            });
+        } catch (error) {
+            console.error(error);
+            setMsg({ type: 'error', text: 'Erro ao carregar configuracoes do assistente.' });
+        } finally {
+            setLoadingAssistantSettings(false);
+        }
+    };
+
+    const handleAssistantSettingsChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setAssistantSettings(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : Number(value)
+        }));
+    };
+
+    const handleSaveAssistantSettings = async (e) => {
+        e.preventDefault();
+        if (!selectedAssistantUser) return;
+
+        setLoading(true);
+        try {
+            await saveAssistantUserSettings({
+                uid: selectedAssistantUser.id,
+                email: selectedAssistantUser.email,
+                settings: assistantSettings,
+                updatedBy: currentUser?.email || null,
+            });
+            setMsg({ type: 'success', text: `Configuracoes do assistente salvas para ${selectedAssistantUser.email}.` });
+        } catch (error) {
+            console.error(error);
+            setMsg({ type: 'error', text: 'Erro ao salvar configuracoes do assistente.' });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -513,6 +595,20 @@ export default function AdminScreen({ onBack }) {
                     <Users size={18} /> Gerenciar Admins
                 </button>
                 <button
+                    onClick={() => setActiveTab('assistant')}
+                    style={{
+                        padding: '1rem',
+                        background: 'transparent',
+                        border: 'none',
+                        color: activeTab === 'assistant' ? 'var(--koche-red)' : '#666',
+                        borderBottom: activeTab === 'assistant' ? '2px solid var(--koche-red)' : 'none',
+                        cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: '0.5rem'
+                    }}
+                >
+                    <Bot size={18} /> Assistente Virtual
+                </button>
+                <button
                     onClick={() => setActiveTab('leads')}
                     style={{
                         padding: '1rem',
@@ -773,6 +869,105 @@ export default function AdminScreen({ onBack }) {
                                     <p style={{ color: '#666', fontSize: '0.9rem', fontStyle: 'italic' }}>Nenhum admin adicional cadastrado.</p>
                                 )}
                             </div>
+                        )}
+                    </div>
+                </>
+            ) : activeTab === 'assistant' ? (
+                <>
+                    <div className="card">
+                        <h3 style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}>
+                            <Bot size={20} /> Controles do Assistente Virtual
+                        </h3>
+                        <p style={{ color: '#ccc', marginBottom: '1rem', lineHeight: '1.6' }}>
+                            Pesquise um usuario para habilitar ou bloquear o assistente e ajustar os limites diarios e mensais de uso.
+                        </p>
+
+                        <div style={{ marginBottom: '2rem', position: 'relative' }}>
+                            <div style={{ position: 'relative' }}>
+                                <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
+                                <input
+                                    className="admin-input"
+                                    style={{ width: '100%', paddingLeft: '35px' }}
+                                    placeholder="Pesquisar usuario por email..."
+                                    value={assistantUserQuery}
+                                    onChange={handleAssistantSearchChange}
+                                    autoComplete="off"
+                                />
+                            </div>
+
+                            {searchingAssistantUsers && (
+                                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#333', border: '1px solid #555', borderRadius: '0 0 8px 8px', maxHeight: '200px', overflowY: 'auto', zIndex: 10 }}>
+                                    <div style={{ padding: '10px', color: '#ccc', fontStyle: 'italic', fontSize: '0.9rem' }}>Buscando...</div>
+                                </div>
+                            )}
+
+                            {assistantUserSuggestions.length > 0 && (
+                                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#222', border: '1px solid #444', borderRadius: '0 0 8px 8px', maxHeight: '200px', overflowY: 'auto', zIndex: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.5)' }}>
+                                    {assistantUserSuggestions.map(user => (
+                                        <div
+                                            key={user.id}
+                                            onClick={() => handleSelectAssistantUser(user)}
+                                            style={{ padding: '10px', borderBottom: '1px solid #333', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = '#333'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            <span style={{ color: 'white', fontWeight: 'bold' }}>{user.email}</span>
+                                            {user.name && <span style={{ color: '#888', fontSize: '0.8rem' }}>{user.name}</span>}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {selectedAssistantUser && (
+                            <form onSubmit={handleSaveAssistantSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ padding: '1rem', border: '1px solid #333', borderRadius: '8px', background: 'rgba(255,255,255,0.03)' }}>
+                                    <strong style={{ color: 'white' }}>{selectedAssistantUser.email}</strong>
+                                    {selectedAssistantUser.name && <div style={{ color: '#999', marginTop: '0.25rem' }}>{selectedAssistantUser.name}</div>}
+                                </div>
+
+                                {loadingAssistantSettings ? (
+                                    <p style={{ color: '#999' }}>Carregando configuracoes...</p>
+                                ) : (
+                                    <>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'white' }}>
+                                            <input
+                                                type="checkbox"
+                                                name="enabled"
+                                                checked={assistantSettings.enabled}
+                                                onChange={handleAssistantSettingsChange}
+                                            />
+                                            Habilitar Assistente Virtual para este usuario
+                                        </label>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Limite Diario de Requisicoes</label>
+                                                <input type="number" min="0" name="dailyRequestLimit" value={assistantSettings.dailyRequestLimit} onChange={handleAssistantSettingsChange} className="admin-input" />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Limite Mensal de Requisicoes</label>
+                                                <input type="number" min="0" name="monthlyRequestLimit" value={assistantSettings.monthlyRequestLimit} onChange={handleAssistantSettingsChange} className="admin-input" />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Limite Diario de Tokens</label>
+                                                <input type="number" min="0" name="dailyTokenLimit" value={assistantSettings.dailyTokenLimit} onChange={handleAssistantSettingsChange} className="admin-input" />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Limite Mensal de Tokens</label>
+                                                <input type="number" min="0" name="monthlyTokenLimit" value={assistantSettings.monthlyTokenLimit} onChange={handleAssistantSettingsChange} className="admin-input" />
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" className="btn-primary" disabled={loading} style={{ justifyContent: 'center' }}>
+                                            {loading ? 'Salvando...' : <><Save size={18} /> Salvar Configuracoes do Assistente</>}
+                                        </button>
+                                    </>
+                                )}
+                            </form>
                         )}
                     </div>
                 </>

@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Login from './components/Login'
 import ProfileForm from './components/ProfileForm'
 import ErrorBoundary from './components/ErrorBoundary'
-import { fetchVehicleData } from './services/dataService'
 import CourseScreen from './components/CourseScreen'
 import LearningPlatformScreen from './components/LearningPlatformScreen'
 import AssistantScreen from './components/AssistantScreen';
@@ -15,14 +14,7 @@ import UserArea from './components/UserArea';
 function AppContent() {
   const { currentUser, userProfile, isAdmin } = useAuth();
   const [currentView, setCurrentView] = useState('welcome'); // 'welcome' | 'guide' | 'course' | 'learning-platform' | 'assistant' | 'admin' | 'profile'
-
-  // Also load database here to pass to Assistant? Or let Assistant fetch it?
-  // Ideally, AssistantScreen fetches, but it's small enough to share if logical.
-
-  const [database, setDatabase] = useState([]);
-  useEffect(() => {
-    fetchVehicleData().then(data => setDatabase(data));
-  }, []);
+  const [guidePrefill, setGuidePrefill] = useState(null);
 
   console.log("AppContent Render:", { currentUser, userProfile, currentView });
 
@@ -42,7 +34,10 @@ function AppContent() {
   if (currentView === 'welcome') {
     return (
         <WelcomeScreen
-          onStartGuide={() => setCurrentView('guide')}
+          onStartGuide={() => {
+            setGuidePrefill(null);
+            setCurrentView('guide');
+          }}
           onStartCourse={() => setCurrentView('course')}
           onStartLearningPlatform={() => setCurrentView('learning-platform')}
           onStartAssistant={() => setCurrentView('assistant')}
@@ -62,7 +57,15 @@ function AppContent() {
   }
 
   if (currentView === 'assistant') {
-    return <AssistantScreen onBack={() => setCurrentView('welcome')} database={database} />;
+    return (
+      <AssistantScreen
+        onBack={() => setCurrentView('welcome')}
+        onOpenGuide={(guideAction) => {
+          setGuidePrefill(guideAction);
+          setCurrentView('guide');
+        }}
+      />
+    );
   }
 
   if (currentView === 'admin' && isAdmin) {
@@ -74,7 +77,7 @@ function AppContent() {
   }
 
   // Default: Guide (Dashboard)
-  return <Dashboard onBack={() => setCurrentView('welcome')} />;
+  return <Dashboard onBack={() => setCurrentView('welcome')} initialSelection={guidePrefill} />;
 }
 
 function App() {

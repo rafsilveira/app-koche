@@ -5,7 +5,7 @@ import { fetchVehicleData } from '../services/dataService';
 import { LogOut, ChevronLeft } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-function Dashboard({ onBack }) {
+function Dashboard({ onBack, initialSelection = null }) {
     const [database, setDatabase] = useState([]); // Empty initially
     const [loading, setLoading] = useState(true);
 
@@ -94,6 +94,15 @@ function Dashboard({ onBack }) {
         setSelectedEngine(val);
     };
 
+    useEffect(() => {
+        if (!initialSelection) return;
+
+        setSelectedBrand(initialSelection.brand ? String(initialSelection.brand) : '');
+        setSelectedModel(initialSelection.model ? String(initialSelection.model) : '');
+        setSelectedYear(initialSelection.year ? String(initialSelection.year) : '');
+        setSelectedEngine(initialSelection.engine ? String(initialSelection.engine) : '');
+    }, [initialSelection]);
+
     return (
         <div className="container">
             <div className="app-header">
@@ -173,6 +182,12 @@ function Dashboard({ onBack }) {
 
 Dashboard.propTypes = {
     onBack: PropTypes.func.isRequired,
+    initialSelection: PropTypes.shape({
+        brand: PropTypes.string,
+        model: PropTypes.string,
+        year: PropTypes.string,
+        engine: PropTypes.string,
+    }),
 };
 
 export default Dashboard;
