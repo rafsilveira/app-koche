@@ -6,7 +6,13 @@
 // CONFIGURATION
 // ------------------------------------------------------------------
 // Option 1: Webhook (Google Sheets, Zapier, n8n, RD Station)
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxvinNteBES3YIy6p188kJvvL-F7Gv7Aq60rIbWiKg740YnLxmg-Ck-MwALcRVfCv9thA/exec";
+// n8n workflow "App Kóche -> Kommo Lead (com checagem de cliente)": cria o lead
+// direto no Kommo (Funil de Vendas), pulando quem já é cliente (Venda ganha /
+// Pós Venda). Substitui o antigo webhook do Google Sheets, que só acumulava
+// numa planilha sem entrar na esteira de vendas.
+const WEBHOOK_URL = "https://n8nvps.kocheautomotiva.com.br/webhook/app-koche-lead";
+// Antigo (mantido só como referência histórica, não usar):
+// "https://script.google.com/macros/s/AKfycbxvinNteBES3YIy6p188kJvvL-F7Gv7Aq60rIbWiKg740YnLxmg-Ck-MwALcRVfCv9thA/exec"
 
 // Option 2: EmailJS
 const EMAILJS_CONFIG = {
@@ -27,6 +33,7 @@ export async function sendLeadToExternal(user) {
         name: user.name || "Usuario",
         email: user.email,
         phone: user.phone,
+        uid: user.uid,
         date: new Date().toISOString(),
         source: "App Koche"
     };
@@ -38,7 +45,7 @@ export async function sendLeadToExternal(user) {
         if (WEBHOOK_URL) {
             await fetch(WEBHOOK_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(leadData)
             });
             console.log("Lead sent via Webhook!");

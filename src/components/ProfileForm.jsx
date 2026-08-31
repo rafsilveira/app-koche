@@ -38,13 +38,19 @@ export default function ProfileForm() {
 
     return (
         <div className="profile-container" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            minHeight: '100vh',
             padding: '20px',
-            background: 'var(--bg-dark)'
+            background: 'rgba(5, 2, 10, 0.92)',
+            backdropFilter: 'blur(4px)'
         }}>
             <div className="profile-card" style={{
                 background: 'var(--bg-card)',

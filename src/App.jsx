@@ -31,15 +31,10 @@ function AppContent() {
     return <Login />;
   }
 
-  // GUARD: User must have profile data (phone)
-  if (!userProfile?.phone) {
-    console.log("Rendering ProfileForm", userProfile);
-    return <ProfileForm />;
-  }
-
   // ROUTING
+  let routedView;
   if (currentView === 'welcome') {
-    return (
+    routedView = (
       <WelcomeScreen
         onStartGuide={() => setCurrentView('guide')}
         onStartCourse={() => setCurrentView('course')}
@@ -49,26 +44,29 @@ function AppContent() {
         isAdmin={isAdmin}
       />
     );
+  } else if (currentView === 'course') {
+    routedView = <CourseScreen onBack={() => setCurrentView('welcome')} />;
+  } else if (currentView === 'assistant') {
+    routedView = <AssistantScreen onBack={() => setCurrentView('welcome')} database={database} />;
+  } else if (currentView === 'admin' && isAdmin) {
+    routedView = <AdminScreen onBack={() => setCurrentView('welcome')} />;
+  } else if (currentView === 'profile') {
+    routedView = <UserArea onBack={() => setCurrentView('welcome')} />;
+  } else {
+    // Default: Guide (Dashboard)
+    routedView = <Dashboard onBack={() => setCurrentView('welcome')} />;
   }
 
-  if (currentView === 'course') {
-    return <CourseScreen onBack={() => setCurrentView('welcome')} />;
-  }
-
-  if (currentView === 'assistant') {
-    return <AssistantScreen onBack={() => setCurrentView('welcome')} database={database} />;
-  }
-
-  if (currentView === 'admin' && isAdmin) {
-    return <AdminScreen onBack={() => setCurrentView('welcome')} />;
-  }
-
-  if (currentView === 'profile') {
-    return <UserArea onBack={() => setCurrentView('welcome')} />;
-  }
-
-  // Default: Guide (Dashboard)
-  return <Dashboard onBack={() => setCurrentView('welcome')} />;
+  // GUARD: User must have profile data (phone) — shown as a mandatory overlay
+  // on top of the app instead of replacing it, so the user never feels like
+  // they "lost access": the app is still there underneath, just blocked
+  // until the phone is provided (required for every account, new or old).
+  return (
+    <>
+      {routedView}
+      {!userProfile?.phone && <ProfileForm />}
+    </>
+  );
 }
 
 function App() {
