@@ -19,6 +19,16 @@
   /* Card Background */
   --surface-modal: #FFFFFF;
 
+  /* Legacy aliases: Login.jsx, ProfileForm.jsx, UserArea.jsx,
+     AssistantScreen.jsx, AssistantModal.jsx, WelcomeScreen.jsx e
+     Dashboard.jsx foram escritos contra um tema escuro anterior e nunca
+     migraram pros tokens Material 3 acima — sem isso, os cards deles
+     ficam com fundo transparente (texto escuro ilegível sobre o overlay). */
+  --bg-dark: var(--surface-ground);
+  --bg-card: var(--surface-card);
+  --border-color: var(--koche-silver);
+  --accent-color: var(--koche-red);
+
   /* Text Colors */
   --text-primary: #1A0B3A;
   /* High Emphasis */
