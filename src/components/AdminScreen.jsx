@@ -24,7 +24,8 @@ export default function AdminScreen({ onBack }) {
         connection: '',
         image_connector_url: '',
         image_location_url: '',
-        videolink: ''
+        videolink: '',
+        level_check_procedure: ''
     });
 
     // TAB STATE
@@ -248,7 +249,8 @@ export default function AdminScreen({ onBack }) {
             connection: vehicle.connection || '',
             image_connector_url: vehicle.image_connector_url || '',
             image_location_url: vehicle.image_location_url || '',
-            videolink: vehicle.videolink || ''
+            videolink: vehicle.videolink || '',
+            level_check_procedure: vehicle.level_check_procedure || ''
         });
         setVehicleResults([]);
         setSearchVehicleQuery('');
@@ -270,7 +272,8 @@ export default function AdminScreen({ onBack }) {
             connection: '',
             image_connector_url: '',
             image_location_url: '',
-            videolink: ''
+            videolink: '',
+            level_check_procedure: ''
         });
     };
 
@@ -394,6 +397,11 @@ export default function AdminScreen({ onBack }) {
             <div className="form-group">
                 <label>Conexão</label>
                 <input name="connection" value={formData.connection} onChange={handleChange} placeholder="Info da conexão" className="admin-input" />
+            </div>
+
+            <div className="form-group">
+                <label>Como Verificar o Nível</label>
+                <textarea name="level_check_procedure" value={formData.level_check_procedure} onChange={handleChange} placeholder="Explique o procedimento de verificação de nível dessa transmissão" className="admin-input" rows="4" />
             </div>
 
             <div className="form-group">

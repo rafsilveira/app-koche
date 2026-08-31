@@ -118,6 +118,15 @@ const ResultCard = ({ data }) => {
                         )}
                     </div>
                 </div>
+
+                {data.level_check_procedure && (
+                    <div className="info-item" style={{ marginTop: '1.5rem' }}>
+                        <span className="info-label">Como Verificar o Nível</span>
+                        <div className="info-value" style={{ whiteSpace: 'pre-line' }}>
+                            {data.level_check_procedure}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {selectedImage && (
