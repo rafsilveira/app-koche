@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Espelha a mesma lógica de AuthContext.jsx: e-mail hardcoded do
+      // dono do app OU presente na coleção `admins` (doc ID = e-mail).
+      return isSignedIn() &&
+        (request.auth.token.email == 'rafsilveira@gmail.com' ||
+         exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
+    }
+
+    // Catálogo de veículos: qualquer usuário logado pode ler (o app precisa
+    // disso pra funcionar); só admin pode escrever/editar/apagar.
+    match /vehicles/{vehicleId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Perfil de usuário: cada um lê/escreve o PRÓPRIO documento; admin
+    // também pode ler (necessário pra busca/listagem de usuários na tela
+    // Admin — searchUsers/getAllUsers em dataService.js). Escrita continua
+    // só do próprio dono (nenhum admin edita perfil de outro usuário hoje).
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Lista de admins: leitura liberada pra logado (o app lê a coleção
+    // inteira pra checar se o e-mail do usuário está na lista). Só um
+    // admin existente pode adicionar/remover outro admin (tela Admin
+    // já faz isso hoje). ID do documento = e-mail (admins/fulano@gmail.com).
+    match /admins/{adminEmail} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Qualquer coleção futura não listada acima: negada por padrão
+    // (seguro por padrão) até definirmos a regra específica.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

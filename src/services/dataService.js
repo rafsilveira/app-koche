@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, addDoc, writeBatch, doc, deleteDoc, query, where, limit, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, setDoc, writeBatch, doc, deleteDoc, query, where, limit, updateDoc } from 'firebase/firestore';
 // import localData from '../../Data_Carros_Koche_App.json'; // REMOVED: Firestore is now the single source of truth
 
 const CACHE_KEY = 'koche_vehicle_data_v1';
@@ -181,7 +181,9 @@ export async function getAdmins() {
  */
 export async function addAdmin(email) {
     try {
-        await addDoc(collection(db, "admins"), { email });
+        // Doc ID = email, needed for the Firestore security rule's exists()
+        // check (rules can't query by field, only by exact document path).
+        await setDoc(doc(db, "admins", email), { email });
         return true;
     } catch (e) {
         console.error("Error adding admin:", e);
