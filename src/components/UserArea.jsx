@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { ChevronLeft, LogOut, Save, User } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -16,6 +16,18 @@ export default function UserArea({ onBack }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [hasSyncedProfile, setHasSyncedProfile] = useState(false);
+
+    // userProfile chega de forma assíncrona do Firestore e pode ainda não
+    // estar pronto quando este componente monta pela primeira vez - sem
+    // isso, o campo fica travado vazio até a tela ser desmontada/remontada.
+    useEffect(() => {
+        if (!hasSyncedProfile && userProfile) {
+            setName(userProfile.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || '');
+            setPhone(userProfile.phone || '');
+            setHasSyncedProfile(true);
+        }
+    }, [userProfile, hasSyncedProfile, currentUser]);
 
     const formatPhone = (val) => {
         return val.replace(/\D/g, '');

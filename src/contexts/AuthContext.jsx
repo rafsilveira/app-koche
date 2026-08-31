@@ -71,16 +71,27 @@ export function AuthProvider({ children }) {
     };
 
     // Sign up with Email/Password
-    const signupEmailPassword = async (email, password, name) => {
+    const signupEmailPassword = async (email, password, name, phone) => {
         try {
             const result = await createUserWithEmailAndPassword(auth, email, password);
             const userDocRef = doc(db, "users", result.user.uid);
             const newUser = {
                 name: name,
                 email: email,
+                phone: phone || '',
                 createdAt: new Date(),
             };
             await setDoc(userDocRef, newUser);
+
+            if (phone) {
+                sendLeadToExternal({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    uid: result.user.uid
+                });
+            }
+
             return result;
         } catch (error) {
             console.error("Email signup failed", error);

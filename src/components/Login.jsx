@@ -6,6 +6,7 @@ export default function Login() {
     const [isLogin, setIsLogin] = useState(true);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -35,6 +36,15 @@ export default function Login() {
             return setError('Preencha o nome.');
         }
 
+        let fullPhone = '';
+        if (!isLogin) {
+            const cleanPhone = phone.replace(/\D/g, '');
+            if (cleanPhone.length < 10) {
+                return setError('Telefone inválido. Inclua o DDD.');
+            }
+            fullPhone = cleanPhone.startsWith('55') ? `+${cleanPhone}` : `+55${cleanPhone}`;
+        }
+
         try {
             setError('');
             setLoading(true);
@@ -42,7 +52,7 @@ export default function Login() {
             if (isLogin) {
                 await loginEmailPassword(email, password);
             } else {
-                await signupEmailPassword(email, password, name);
+                await signupEmailPassword(email, password, name, fullPhone);
             }
             // App.js handles Auth state change
         } catch (err) {
@@ -133,6 +143,28 @@ export default function Login() {
                             }}
                         />
                     </div>
+
+                    {!isLogin && (
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Telefone (com DDD) *</label>
+                            <input
+                                type="tel"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="11999999999"
+                                required={!isLogin}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--border-color)',
+                                    background: 'var(--bg-dark)',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '1rem'
+                                }}
+                            />
+                        </div>
+                    )}
 
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Senha *</label>
