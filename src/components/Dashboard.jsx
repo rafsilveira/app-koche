@@ -165,7 +165,7 @@ function Dashboard({ onBack }) {
                     </p>
                 </div>
                 <p>© {new Date().getFullYear()} App Kóche. Todos os direitos reservados.</p>
-                <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>v1.3 (AI Assistant)</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>v{__APP_VERSION__}</span>
             </footer>
         </div>
     )

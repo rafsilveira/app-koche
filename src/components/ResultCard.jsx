@@ -1,8 +1,13 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { processImageLink, processVideoLink } from '../services/dataService';
 
 const ResultCard = ({ data }) => {
+    // Hooks precisam rodar em toda renderização, antes de qualquer retorno
+    // antecipado - senão o React perde a contagem de hooks quando `data`
+    // alterna entre null e um veículo (viola as Rules of Hooks).
+    const [selectedImage, setSelectedImage] = React.useState(null);
+
     if (!data) return null;
 
     // Process links using the centralized service
@@ -11,8 +16,6 @@ const ResultCard = ({ data }) => {
     const locationImg = processImageLink(data.image_location_url || data.imageLocation);
 
     const videoEmbedUrl = processVideoLink(data.videolink || data.videoLink || data.videoProcedure); // Handle all keys
-
-    const [selectedImage, setSelectedImage] = React.useState(null);
 
     const renderImageOrText = (imgUrl, rawValue, label) => {
         if (imgUrl) {

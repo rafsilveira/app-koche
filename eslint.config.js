@@ -6,10 +6,13 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 export default [
   { ignores: ['dist'] },
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        __APP_VERSION__: 'readonly', // injetado pelo define() no vite.config.js
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -28,13 +31,24 @@ export default [
         { allowConstantExport: true },
       ],
       'no-unused-vars': ['warn', { varsIgnorePattern: '^[A-Z_]' }],
-      'react/prop-types': 'off', // Disabling prop-types enforcement if not strictly using it everywhere yet, or keep it on.
-      // Since I added PropTypes to new components, I could try to keep it, but standard template usually turns it off or relies on Typescript.
-      // Since this is JS, I'll assume we want basic checks.
-      // But 'react' plugin is not imported/configured here explicitly? 
-      // The original config didn't have 'eslint-plugin-react'. It had 'react-hooks' and 'react-refresh'.
-      // So I won't add react rules unless I add the plugin.
-      // I'll stick to what was there + fix.
+      'react/prop-types': 'off',
+    },
+  },
+  {
+    // Scripts de build/deploy rodam em Node, não no navegador - precisam
+    // de `process`/`__dirname` reconhecidos, sem as regras de React.
+    files: ['*.js', 'scripts/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.node,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      'no-unused-vars': ['warn', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
 ]
