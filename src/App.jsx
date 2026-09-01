@@ -1,15 +1,30 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Login from './components/Login'
 import ProfileForm from './components/ProfileForm'
 import ErrorBoundary from './components/ErrorBoundary'
 import { fetchVehicleData } from './services/dataService'
-import CourseScreen from './components/CourseScreen'
-import AssistantScreen from './components/AssistantScreen';
-import AdminScreen from './components/AdminScreen';
-import Dashboard from './components/Dashboard';
 import WelcomeScreen from './components/WelcomeScreen';
-import UserArea from './components/UserArea';
+
+// Carregadas sob demanda: nenhuma delas aparece na primeira tela (Welcome),
+// então não precisam entrar no bundle inicial. AssistantScreen em particular
+// carrega o SDK do Gemini, que é pesado.
+const CourseScreen = lazy(() => import('./components/CourseScreen'));
+const AssistantScreen = lazy(() => import('./components/AssistantScreen'));
+const AdminScreen = lazy(() => import('./components/AdminScreen'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const UserArea = lazy(() => import('./components/UserArea'));
+
+function ViewLoading() {
+  return (
+    <div style={{
+      display: 'flex', justifyContent: 'center', alignItems: 'center',
+      minHeight: '50vh', color: 'var(--text-secondary)'
+    }}>
+      Carregando...
+    </div>
+  );
+}
 
 function AppContent() {
   const { currentUser, userProfile, isAdmin } = useAuth();
@@ -63,7 +78,9 @@ function AppContent() {
   // until the phone is provided (required for every account, new or old).
   return (
     <>
-      {routedView}
+      <Suspense fallback={<ViewLoading />}>
+        {routedView}
+      </Suspense>
       {!userProfile?.phone && <ProfileForm />}
     </>
   );
