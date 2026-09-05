@@ -24,6 +24,7 @@ export default function AdminScreen({ onBack }) {
         connection: '',
         image_connector_url: '',
         image_location_url: '',
+        image_level_url: '',
         videolink: '',
         level_check_procedure: ''
     });
@@ -249,6 +250,7 @@ export default function AdminScreen({ onBack }) {
             connection: vehicle.connection || '',
             image_connector_url: vehicle.image_connector_url || '',
             image_location_url: vehicle.image_location_url || '',
+            image_level_url: vehicle.image_level_url || '',
             videolink: vehicle.videolink || '',
             level_check_procedure: vehicle.level_check_procedure || ''
         });
@@ -272,6 +274,7 @@ export default function AdminScreen({ onBack }) {
             connection: '',
             image_connector_url: '',
             image_location_url: '',
+            image_level_url: '',
             videolink: '',
             level_check_procedure: ''
         });
@@ -402,6 +405,11 @@ export default function AdminScreen({ onBack }) {
             <div className="form-group">
                 <label>Como Verificar o Nível</label>
                 <textarea name="level_check_procedure" value={formData.level_check_procedure} onChange={handleChange} placeholder="Explique o procedimento de verificação de nível dessa transmissão" className="admin-input" rows="4" />
+            </div>
+
+            <div className="form-group">
+                <label>Link Imagem do Nível (Google Drive)</label>
+                <input name="image_level_url" value={formData.image_level_url} onChange={handleChange} className="admin-input" />
             </div>
 
             <div className="form-group">

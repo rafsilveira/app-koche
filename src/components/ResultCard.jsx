@@ -14,8 +14,14 @@ const ResultCard = ({ data }) => {
     // Fallback to old CamelCase keys if new snake_case keys are missing (backward compatibility)
     const connectorImg = processImageLink(data.image_connector_url || data.imageConnector);
     const locationImg = processImageLink(data.image_location_url || data.imageLocation);
+    const levelImg = processImageLink(data.image_level_url);
 
-    const videoEmbedUrl = processVideoLink(data.videolink || data.videoLink || data.videoProcedure); // Handle all keys
+    const videoEmbedUrlRaw = processVideoLink(data.videolink || data.videoLink || data.videoProcedure); // Handle all keys
+    // Autoplay mudo assim que o resultado abre - navegadores só permitem autoplay
+    // com som cortado, então "mute=1" é obrigatório pro autoplay funcionar de verdade.
+    const videoEmbedUrl = videoEmbedUrlRaw
+        ? `${videoEmbedUrlRaw}${videoEmbedUrlRaw.includes('?') ? '&' : '?'}autoplay=1&mute=1`
+        : videoEmbedUrlRaw;
 
     const renderImageOrText = (imgUrl, rawValue, label) => {
         if (imgUrl) {
@@ -128,6 +134,13 @@ const ResultCard = ({ data }) => {
                         <div className="info-value" style={{ whiteSpace: 'pre-line' }}>
                             {data.level_check_procedure}
                         </div>
+                    </div>
+                )}
+
+                {levelImg && (
+                    <div className="info-item" style={{ marginTop: '1.5rem' }}>
+                        <span className="info-label">Foto do Nível</span>
+                        {renderImageOrText(levelImg, null, "Nível")}
                     </div>
                 )}
             </div>
