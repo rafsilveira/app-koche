@@ -1,5 +1,12 @@
 # Configuração da Base de Dados na Planilha
 
+> 🔴 **DOCUMENTO OBSOLETO — 18/Set/2026.** A aba `Dados` descrita aqui **não é mais a fonte**,
+> confirmado por Rafael. Ela não tem as colunas **Nível** nem **Foto Nível**, então recarregar o
+> Firestore a partir dela apagaria 181 descrições de nível e 144 fotos. A aba viva é a `Sheet1`,
+> e a sincronização é feita por `scripts/sync_planilha_firestore.py`.
+>
+> Fica no repositório como registro de como a aba nasceu, não como instrução a seguir.
+
 Para usar a planilha como base de dados (fotos, vídeos, specs), siga estes passos na **MESMA PLANILHA** que já criamos.
 
 ## 1. Criar a Aba de Dados
