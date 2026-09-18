@@ -31,3 +31,6 @@ dist-ssr
 android-twa/
 
 .env
+
+# gerado quando os scripts importam uns aos outros
+__pycache__/
