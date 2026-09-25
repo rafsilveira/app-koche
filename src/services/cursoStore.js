@@ -12,3 +12,12 @@ export async function carregarProgresso(uid) {
 export async function salvarAula(uid, aulaId, dados) {
     await setDoc(doc(db, 'users', uid), { curso: { aulas: { [aulaId]: dados }, atualizadoEm: new Date().toISOString() } }, { merge: true });
 }
+
+/** Resultado do teste final: nota, tentativas e a aprovação (só grava aprovadoEm na primeira aprovação). */
+export async function salvarTeste(uid, dados) {
+    await setDoc(doc(db, 'users', uid), { curso: { teste: dados, atualizadoEm: new Date().toISOString() } }, { merge: true });
+}
+
+export async function marcarEventoEnviado(uid) {
+    await setDoc(doc(db, 'users', uid), { curso: { teste: { eventoEnviadoEm: new Date().toISOString() } } }, { merge: true });
+}

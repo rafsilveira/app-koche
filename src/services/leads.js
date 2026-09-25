@@ -26,14 +26,17 @@ const EMAILJS_CONFIG = {
  * Sends user data to the configured external service.
  * @param {Object} user - The user object { name, email, phone, uid }
  */
-export async function sendLeadToExternal(user) {
-    if (!user) return;
+// `evento` (25/Set/2026, decisão de Rafael): 'cadastro' NÃO cria lead no Kommo (só marca quem já existe); 'contato' e
+// 'curso_aprovado' criam. Quem decide é o workflow bOHhGUdGgwux3YHG; o app só diz o que aconteceu.
+export async function sendLeadToExternal(user, evento = 'cadastro') {
+    if (!user) return false;
 
     const leadData = {
         name: user.name || "Usuario",
         email: user.email,
         phone: user.phone,
         uid: user.uid,
+        evento,
         date: new Date().toISOString(),
         source: "App Koche"
     };
@@ -43,12 +46,13 @@ export async function sendLeadToExternal(user) {
     try {
         // 1. WEBHOOK STRATEGY
         if (WEBHOOK_URL) {
-            await fetch(WEBHOOK_URL, {
+            const r = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(leadData)
             });
-            console.log("Lead sent via Webhook!");
+            console.log("Lead sent via Webhook!", evento, r.status);
+            return r.ok;
         }
 
         // 2. EMAILJS STRATEGY
@@ -65,4 +69,5 @@ export async function sendLeadToExternal(user) {
         // We do NOT throw errors here to avoid blocking the user experience.
         // Failing to send a lead to CRM shouldn't stop the user from using the app.
     }
+    return false;
 }

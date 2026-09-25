@@ -123,3 +123,17 @@
 .k-banner__txt { margin: 0; font-size: 14px; color: rgba(255, 255, 255, .85); }
 .k-banner .k-btn { margin-top: 6px; }
 .k-banner__nota { margin: 2px 0 0; font-size: 11.5px; color: rgba(255, 255, 255, .62); }
+
+/* ---------- Teste final ---------- */
+.quiz { display: grid; gap: 14px; }
+.quiz__barra { margin-top: -6px; }
+.quiz__pergunta { font-size: clamp(18px, 3vw, 22px); margin: 4px 0 0; }
+.quiz__opcoes { display: grid; gap: 10px; }
+.quiz__opcao { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; width: 100%; text-align: left; font: inherit; font-size: 15px; line-height: 1.45; color: var(--k-ink); background: #fff; border: 1.5px solid var(--k-gray-2); border-radius: var(--k-radius); padding: 12px 14px; cursor: pointer; transition: border-color .15s, background .15s; }
+.quiz__opcao:hover { border-color: var(--k-navy); }
+.quiz__opcao--marcada { border: 2px solid var(--k-navy); background: #F1EEF8; }
+.quiz__letra { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--k-gray-1); font-family: var(--k-font-titulo); font-weight: 800; font-size: 13px; color: var(--k-navy); }
+.quiz__opcao--marcada .quiz__letra { background: var(--k-navy); color: #fff; }
+.quiz__nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
+.quiz__nota { display: flex; align-items: center; gap: 14px; }
+.quiz__nota strong { font-family: var(--k-font-titulo); font-size: 42px; font-weight: 800; color: var(--k-navy); letter-spacing: -.02em; line-height: 1; }

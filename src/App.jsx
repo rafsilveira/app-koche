@@ -10,6 +10,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 // então não precisam entrar no bundle inicial. AssistantScreen em particular
 // carrega o SDK do Gemini, que é pesado.
 const CourseScreen = lazy(() => import('./components/CourseScreen'));
+const QuizScreen = lazy(() => import('./components/QuizScreen'));
 const AssistantScreen = lazy(() => import('./components/AssistantScreen'));
 const AdminScreen = lazy(() => import('./components/AdminScreen'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -60,7 +61,9 @@ function AppContent() {
       />
     );
   } else if (currentView === 'course') {
-    routedView = <CourseScreen onBack={() => setCurrentView('welcome')} />;
+    routedView = <CourseScreen onBack={() => setCurrentView('welcome')} onStartQuiz={() => setCurrentView('quiz')} />;
+  } else if (currentView === 'quiz') {
+    routedView = <QuizScreen onBack={() => setCurrentView('course')} />;
   } else if (currentView === 'assistant') {
     routedView = <AssistantScreen onBack={() => setCurrentView('welcome')} database={database} />;
   } else if (currentView === 'admin' && isAdmin) {

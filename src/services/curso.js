@@ -10,7 +10,7 @@ export const AULAS = [
 
 export const LIMIAR_CONCLUSAO = 0.9;   // fração do vídeo assistida para contar como concluída
 export const SALTO_MAXIMO = 2.5;       // segundos entre duas leituras; acima disso foi busca na barra, não assistir
-export const TESTE_DISPONIVEL = false; // vira true quando o teste (fase B) existir
+export const TESTE_DISPONIVEL = true;  // teste final (src/services/teste.js), desde 25/Set/2026
 
 export const thumb = (videoId) => `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
 
@@ -58,4 +58,8 @@ export function percentualAula(progresso, aulaId) {
 /** Primeira aula liberada e ainda não concluída — a que o aluno deve abrir. */
 export function proximaAula(progresso) {
     return AULAS.find((a, i) => liberada(progresso, i) && !estaConcluida(progresso, a.id)) || null;
+}
+
+export function testeAprovado(progresso) {
+    return Boolean(progresso?.teste?.aprovadoEm);
 }
