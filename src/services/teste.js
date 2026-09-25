@@ -37,10 +37,10 @@ export const PERGUNTAS = [
     },
     {
         id: 'fluxo',
-        texto: 'Antes de conectar a FT-100, como identificar qual mangueira é a de retorno da transmissão?',
+        texto: 'Antes de conectar a FT-100, como saber em qual mangueira do carro vai a mangueira vermelha da máquina?',
         alternativas: [
-            'Dando uma partida rápida no veículo, de 2 a 3 segundos: a mangueira de onde sai fluido é a de retorno, e é nela que entra a mangueira de fluido novo da máquina.',
-            'Pela cor da mangueira do carro: a preta é sempre o retorno.',
+            'Dando um toque na partida de 2 a 3 segundos: na mangueira que sair fluido, você conecta a mangueira vermelha da máquina.',
+            'Pela cor: a mangueira preta do carro recebe sempre a vermelha da máquina.',
             'Medindo a temperatura das duas mangueiras com o motor desligado.',
             'Não precisa identificar: a FT-100 corrige o sentido do fluxo sozinha.',
         ],
