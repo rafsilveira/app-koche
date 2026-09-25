@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './assets/curso.css'
 import App from './App.jsx'
 // Force unregister service workers to fix cache issues
 console.log("VERSION: 2026-01-29 Light Theme Fix - Path Corrected");

@@ -28,7 +28,16 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
             />
 
             <div className="card" style={{ maxWidth: '400px', width: '100%', textAlign: 'center', padding: '3rem 2rem' }}>
-                <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', textTransform: 'uppercase', color: 'var(--koche-blue)' }}>Bem-vindo</h2>
+                <h2 style={{ marginBottom: '1.25rem', fontSize: '1.5rem', textTransform: 'uppercase', color: 'var(--koche-blue)' }}>Bem-vindo</h2>
+
+                {/* Banner do curso (pedido de Rafael, 25/Set/2026): curso grátis com certificado e R$ 1.000 de desconto. Visual nos moldes do site (curso.css). */}
+                <div className="k-banner">
+                    <p className="k-banner__eyebrow">Curso grátis com certificado</p>
+                    <p className="k-banner__titulo">Ganhe <em>R$ 1.000 de desconto</em> em qualquer máquina Kóche*</p>
+                    <p className="k-banner__txt">3 aulas em vídeo, teste ao final e certificado. O desconto fica registrado no seu nome.</p>
+                    <button type="button" onClick={onStartCourse} className="k-btn k-btn--primary k-btn--block"><GraduationCap size={20} /> Começar o curso</button>
+                    <p className="k-banner__nota">*Para quem concluir todas as aulas e for aprovado no teste. Uma vez por pessoa.</p>
+                </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {/* BOTÃO GUIA (Primary Action) */}

@@ -1,0 +1,118 @@
+/* ============================================================================
+   Curso — visual nos moldes do SITE (pedido de Rafael, 25/Set/2026).
+   Régua: tema/koche/assets/css/main.css do site. Tokens copiados, não imitados:
+   navy #1A0B3A · red-2 #D9002D (ação) · red #FF0035 · gray-1 #F5F5F8 (chão) ·
+   gray-2 #E4E4EA (borda) · gray-6 #5B5B68 (texto secundário) · ink #1C1B22 ·
+   green-2 #1DA851 · radius 12 · sombra 0 8px 28px rgba(26,11,58,.08).
+   Fontes: Navigo (títulos, botões, selos) e Manrope (texto) — servidas daqui,
+   porque o site não manda Access-Control-Allow-Origin para outro domínio.
+   Receitas reproduzidas: .eyebrow, .btn/.btn--primary/.btn--ghost, .produto__selo,
+   .hero__preco, .produto (card 16px + sombra), .chips.
+   Tudo com prefixo k- para não brigar com o CSS do app (.btn-primary, .card).
+   ========================================================================== */
+@font-face { font-family: "Navigo"; font-style: normal; font-weight: 300; font-display: swap; src: url("./fonts/navigo-light.woff2") format("woff2"); }
+@font-face { font-family: "Navigo"; font-style: normal; font-weight: 400; font-display: swap; src: url("./fonts/navigo-regular.woff2") format("woff2"); }
+@font-face { font-family: "Navigo"; font-style: normal; font-weight: 500; font-display: swap; src: url("./fonts/navigo-medium.woff2") format("woff2"); }
+@font-face { font-family: "Navigo"; font-style: normal; font-weight: 600 800; font-display: swap; src: url("./fonts/navigo-bold.woff2") format("woff2"); }
+@font-face { font-family: "Navigo"; font-style: normal; font-weight: 900; font-display: swap; src: url("./fonts/navigo-black.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 400 800; font-display: swap; src: url("./fonts/manrope-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 400 800; font-display: swap; src: url("./fonts/manrope-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  --k-navy: #1A0B3A; --k-navy-2: #2A1A55; --k-red: #FF0035; --k-red-2: #D9002D; --k-red-3: #B80026;
+  --k-gray-1: #F5F5F8; --k-gray-2: #E4E4EA; --k-gray-6: #5B5B68; --k-ink: #1C1B22;
+  --k-green: #25D366; --k-green-2: #1DA851; --k-green-txt: #15803D; --k-amber: #F5A623;
+  --k-radius: 12px; --k-shadow: 0 8px 28px rgba(26, 11, 58, .08);
+  --k-font: Manrope, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --k-font-titulo: Navigo, Manrope, system-ui, sans-serif;
+}
+
+/* ---------- Página ---------- */
+.curso { background: var(--k-gray-1); min-height: 100vh; padding: 16px 0 96px; font-family: var(--k-font); color: var(--k-ink); -webkit-font-smoothing: antialiased; }
+.curso__wrap { max-width: 900px; margin: 0 auto; padding: 0 16px; display: grid; gap: 20px; }
+.curso h1, .curso h2, .curso h3 { font-family: var(--k-font-titulo); font-weight: 800; line-height: 1.15; letter-spacing: -.01em; color: var(--k-navy); margin: 0 0 .4em; text-wrap: balance; }
+.curso h1 { font-size: clamp(26px, 4.6vw, 36px); }
+.curso h2 { font-size: clamp(20px, 3.2vw, 26px); }
+.curso p { margin: 0 0 .6em; line-height: 1.55; }
+.curso__topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.k-eyebrow { color: var(--k-red-2); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 8px; }
+.k-card { background: #fff; border: 1px solid var(--k-gray-2); border-radius: 16px; box-shadow: var(--k-shadow); padding: 22px; }
+.k-muted { color: var(--k-gray-6); }
+
+/* ---------- Botões (receita .btn do site) ---------- */
+.k-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 22px; border-radius: 10px; font-family: var(--k-font-titulo); font-weight: 700; font-size: 15px; line-height: 1.2; text-decoration: none; border: 2px solid transparent; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.k-btn--primary { background: var(--k-red-2); color: #fff; border-color: var(--k-red-2); }
+.k-btn--primary:hover { background: var(--k-red-3); border-color: var(--k-red-3); color: #fff; }
+.k-btn--ghost { background: #fff; color: var(--k-navy); border-color: var(--k-navy); }
+.k-btn--ghost:hover { background: var(--k-navy); color: #fff; }
+.k-btn--sm { min-height: 38px; padding: 6px 14px; font-size: 14px; }
+.k-btn--lg { min-height: 54px; padding: 14px 28px; font-size: 17px; }
+.k-btn--block { width: 100%; }
+.k-btn[disabled], .k-btn--desabilitado { background: var(--k-gray-2); color: var(--k-gray-6); border-color: var(--k-gray-2); cursor: not-allowed; }
+
+/* ---------- Selos (receita .produto__selo do site) ---------- */
+.k-selo { display: inline-block; background: var(--k-navy); color: #fff; font-family: var(--k-font-titulo); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+.k-selo--feita { background: var(--k-green-2); }
+.k-selo--bloqueada { background: var(--k-gray-2); color: var(--k-gray-6); }
+.k-selo--vermelho { background: var(--k-red-2); }
+
+/* ---------- Cabeçalho do curso ---------- */
+.curso__hero { display: grid; gap: 14px; }
+.curso__sub { color: var(--k-gray-6); font-size: 17px; max-width: 60ch; }
+.curso__progresso { display: grid; gap: 8px; }
+.curso__barra { height: 10px; background: var(--k-gray-2); border-radius: 999px; overflow: hidden; }
+.curso__barra span { display: block; height: 100%; background: var(--k-navy); border-radius: 999px; transition: width .4s ease; }
+.curso__progresso p { margin: 0; font-size: 14px; color: var(--k-gray-6); font-weight: 600; }
+
+/* A oferta, na receita do .hero__preco do site */
+.curso__oferta { display: flex; flex-direction: column; gap: 2px; background: #fff; border: 1px solid var(--k-gray-2); border-radius: var(--k-radius); padding: 14px 20px 16px; max-width: 460px; box-shadow: var(--k-shadow); }
+.curso__oferta-label { display: block; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--k-gray-6); }
+.curso__oferta-valor { font-family: var(--k-font-titulo); font-size: 34px; font-weight: 800; color: var(--k-navy); letter-spacing: -.02em; line-height: 1.1; }
+.curso__oferta-txt { font-size: 15px; color: var(--k-gray-6); }
+.curso__oferta-txt strong { color: var(--k-navy); }
+
+/* ---------- Player ---------- */
+.curso__player-card { display: grid; gap: 12px; }
+.k-player { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: var(--k-radius); overflow: hidden; }
+.k-player > div, .k-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+.curso__status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; font-size: 14px; color: var(--k-gray-6); }
+.curso__status strong { color: var(--k-navy); }
+.curso__dica { background: var(--k-gray-1); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: var(--k-gray-6); }
+.curso__dica--ok { background: #EAF7EF; color: var(--k-green-txt); }
+
+/* ---------- Aulas ---------- */
+.curso__aulas { display: grid; gap: 14px; }
+.aula { display: grid; grid-template-columns: 160px 1fr; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--k-gray-2); border-radius: 16px; box-shadow: var(--k-shadow); padding: 14px; cursor: pointer; text-align: left; font: inherit; color: inherit; transition: border-color .15s, transform .15s; }
+.aula:hover { border-color: var(--k-navy); }
+.aula--atual { border: 2px solid var(--k-navy); }
+.aula--bloqueada { cursor: not-allowed; opacity: .72; }
+.aula--bloqueada:hover { border-color: var(--k-gray-2); }
+.aula__thumb { position: relative; aspect-ratio: 16 / 9; border-radius: var(--k-radius); overflow: hidden; background: var(--k-gray-2); }
+.aula__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.aula--bloqueada .aula__thumb img { filter: grayscale(1); }
+.aula__play { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; }
+.aula__play span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(26, 11, 58, .72); }
+.aula__info { display: grid; gap: 6px; min-width: 0; }
+.aula__linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.aula__titulo { font-family: var(--k-font-titulo); font-weight: 800; font-size: 17px; color: var(--k-navy); margin: 0; }
+.aula--bloqueada .aula__titulo { color: var(--k-gray-6); }
+.aula__desc { margin: 0; font-size: 14px; color: var(--k-gray-6); }
+.aula__pct { font-size: 13px; font-weight: 700; color: var(--k-gray-6); }
+.aula__pct b { color: var(--k-navy); }
+@media (max-width: 560px) { .aula { grid-template-columns: 1fr; } }
+
+/* ---------- Teste / próximo passo ---------- */
+.curso__teste { display: grid; gap: 10px; }
+.curso__teste-acoes { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.curso__nota { font-size: 12.5px; color: var(--k-gray-6); }
+.curso__aviso { background: #FFF4F6; border: 1px solid #F7C6CF; color: var(--k-red-3); border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600; }
+
+/* ---------- Banner da tela inicial ---------- */
+.k-banner { display: grid; gap: 8px; text-align: left; background: var(--k-navy); color: #fff; border-radius: 16px; padding: 18px 18px 16px; box-shadow: 0 8px 24px rgba(26, 11, 58, .28); margin: 0 0 1.25rem; font-family: var(--k-font); }
+.k-banner__eyebrow { font-family: var(--k-font-titulo); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .78); margin: 0; }
+.k-banner__titulo { font-family: var(--k-font-titulo); font-weight: 800; font-size: 21px; line-height: 1.15; letter-spacing: -.01em; color: #fff; margin: 0; text-wrap: balance; }
+.k-banner__titulo em { font-style: normal; color: #FF5C7A; }
+.k-banner__txt { margin: 0; font-size: 14px; color: rgba(255, 255, 255, .85); }
+.k-banner .k-btn { margin-top: 6px; }
+.k-banner__nota { margin: 2px 0 0; font-size: 11.5px; color: rgba(255, 255, 255, .62); }

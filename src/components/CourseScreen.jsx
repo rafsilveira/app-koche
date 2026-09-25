@@ -1,176 +1,174 @@
-import { useState } from 'react';
-import { processVideoLink } from '../services/dataService';
-import { ChevronLeft, PlayCircle, Lock } from 'lucide-react';
+// Tela do curso — visual nos moldes do site (src/assets/curso.css) e regras em src/services/curso.js.
+// O que muda em 25/Set/2026: as aulas abrem em ordem, "concluída" é 90% do vídeo assistido de verdade,
+// o progresso fica no Firestore por usuário, e o teste (fase B) entra como próximo passo.
+import { useCallback, useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import { ChevronLeft, PlayCircle, Lock, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import YouTubePlayer from './YouTubePlayer';
+import { AULAS, TESTE_DISPONIVEL, thumb, liberada, estaConcluida, concluidas, cursoConcluido, percentualCurso, percentualAula, proximaAula } from '../services/curso';
+import { carregarProgresso, salvarAula } from '../services/cursoStore';
 
-const COURSES = [
-    {
-        id: 1,
-        title: "Aula 1: Teórica",
-        description: "Fundamentos e conceitos básicos.",
-        videoUrl: "https://youtu.be/tD9ieJkbQec",
-        thumbnail: "https://img.youtube.com/vi/tD9ieJkbQec/mqdefault.jpg"
-    },
-    {
-        id: 2,
-        title: "Aula 2: Prática",
-        description: "Procedimentos práticos de troca.",
-        videoUrl: "https://www.youtube.com/watch?v=gYYSNlaZB9Q",
-        thumbnail: "https://img.youtube.com/vi/gYYSNlaZB9Q/mqdefault.jpg"
-    },
-    {
-        id: 3,
-        title: "Aula 3: Prática",
-        description: "Continuação dos procedimentos práticos.",
-        videoUrl: "https://www.youtube.com/watch?v=Be0NA8uHS64",
-        thumbnail: "https://img.youtube.com/vi/Be0NA8uHS64/mqdefault.jpg"
-    }
-];
+export default function CourseScreen({ onBack, onStartQuiz }) {
+    const { currentUser } = useAuth();
+    const uid = currentUser?.uid;
+    const [progresso, setProgresso] = useState({ aulas: {} });
+    const [carregando, setCarregando] = useState(true);
+    const [selecionada, setSelecionada] = useState(null);
+    const [aviso, setAviso] = useState('');
+    const [dica, setDica] = useState('');
+    const playerRef = useRef(null);
 
-export default function CourseScreen({ onBack }) {
-    const [selectedVideo, setSelectedVideo] = useState(null);
+    useEffect(() => {
+        let vivo = true;
+        if (!uid) { setCarregando(false); return undefined; }
+        carregarProgresso(uid)
+            .then((p) => { if (vivo) setProgresso(p); })
+            .catch((e) => console.error('curso: falha ao carregar progresso', e))
+            .finally(() => { if (vivo) setCarregando(false); });
+        return () => { vivo = false; };
+    }, [uid]);
 
-    const handleVideoClick = (course) => {
-        if (course.isComingSoon) return;
-        setSelectedVideo(course);
+    const gravar = useCallback((aulaId, dados) => {
+        setProgresso((atual) => ({ ...atual, aulas: { ...atual.aulas, [aulaId]: { ...(atual.aulas?.[aulaId] || {}), ...dados } } }));
+        if (uid) salvarAula(uid, aulaId, dados).catch((e) => console.error('curso: falha ao salvar progresso', e));
+    }, [uid]);
+
+    const abrir = (aula, indice) => {
+        if (!liberada(progresso, indice)) {
+            setAviso(`Conclua a ${AULAS[indice - 1].titulo.split(' · ')[0]} para liberar esta aula.`);
+            return;
+        }
+        setAviso('');
+        setDica('');
+        setSelecionada(aula);
+        setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     };
 
+    const onProgresso = ({ segundos, duracao }) => {
+        if (!selecionada || estaConcluida(progresso, selecionada.id)) return;
+        gravar(selecionada.id, { segundos: Math.round(segundos), duracao: Math.round(duracao) });
+    };
+
+    const onConcluida = ({ segundos, duracao }) => {
+        if (!selecionada || estaConcluida(progresso, selecionada.id)) return;
+        gravar(selecionada.id, { segundos: Math.round(segundos), duracao: Math.round(duracao), concluidaEm: new Date().toISOString() });
+        const indice = AULAS.findIndex((a) => a.id === selecionada.id);
+        const proxima = AULAS[indice + 1];
+        setDica(proxima ? `Aula concluída. A ${proxima.titulo.split(' · ')[0]} já está liberada.` : 'Você concluiu todas as aulas. O próximo passo é o teste.');
+    };
+
+    const feitas = concluidas(progresso);
+    const pct = percentualCurso(progresso);
+    const tudo = cursoConcluido(progresso);
+    const proxima = proximaAula(progresso);
+    const pctSelecionada = selecionada ? percentualAula(progresso, selecionada.id) : 0;
+    const selecionadaFeita = selecionada ? estaConcluida(progresso, selecionada.id) : false;
+
     return (
-        <div className="container" style={{ maxWidth: '900px' }}>
-            {/* Header da Seção */}
-            <div className="app-header" style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button onClick={onBack} className="btn-outlined" style={{ padding: '8px 12px' }}>
-                        <ChevronLeft size={18} /> Voltar
-                    </button>
+        <div className="curso">
+            <div className="curso__wrap">
+                <div className="curso__topo">
+                    <button type="button" onClick={onBack} className="k-btn k-btn--ghost k-btn--sm"><ChevronLeft size={18} /> Voltar</button>
+                    <span className="k-selo">Treinamento Kóche</span>
                 </div>
-                <h2>Treinamento Kóche</h2>
-                <div style={{ width: '80px' }}></div> {/* Spacer for alignment */}
-            </div>
 
-            {/* Player de Vídeo (Se selecionado) */}
-            {selectedVideo && (
-                <div className="card" style={{ marginBottom: '2rem', padding: '1.5rem', borderLeft: '4px solid var(--koche-blue)' }}>
-                    <div className="video-container" style={{
-                        position: 'relative',
-                        paddingBottom: '56.25%', /* 16:9 */
-                        height: 0,
-                        background: '#000',
-                        borderRadius: 'var(--radius-sm)',
-                        overflow: 'hidden',
-                        boxShadow: 'var(--elevation-2)'
-                    }}>
-                        <iframe
-                            src={processVideoLink(selectedVideo.videoUrl) + "?autoplay=1"}
-                            title={selectedVideo.title}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%'
-                            }}
-                        />
+                <section className="k-card curso__hero">
+                    <div>
+                        <p className="k-eyebrow">Curso grátis · 3 aulas em vídeo</p>
+                        <h1>Troca de fluido de câmbio automático por diálise</h1>
+                        <p className="curso__sub">Do fundamento à prática. Conclua as aulas na ordem: cada uma libera a seguinte, e a última libera o teste e o certificado.</p>
                     </div>
-                    <div style={{ marginTop: '1.5rem' }}>
-                        <h3 style={{ color: 'var(--koche-blue)', marginBottom: '0.5rem' }}>{selectedVideo.title}</h3>
-                        <p style={{ color: 'var(--text-secondary)' }}>{selectedVideo.description}</p>
+                    <div className="curso__progresso" aria-label="Progresso do curso">
+                        <div className="curso__barra"><span style={{ width: `${pct}%` }} /></div>
+                        <p>{carregando ? 'Carregando seu progresso…' : `${feitas} de ${AULAS.length} aulas concluídas · ${pct}%`}</p>
                     </div>
-                </div>
-            )}
-
-            {/* Lista de Aulas */}
-            <div className="course-list" style={{ display: 'grid', gap: '1rem' }}>
-                {COURSES.map(course => (
-                    <div
-                        key={course.id}
-                        onClick={() => handleVideoClick(course)}
-                        className="card"
-                        style={{
-                            padding: '1rem',
-                            display: 'flex',
-                            gap: '1.5rem',
-                            alignItems: 'center',
-                            cursor: course.isComingSoon ? 'default' : 'pointer',
-                            opacity: course.isComingSoon ? 0.7 : 1,
-                            backgroundColor: course.isComingSoon ? '#F3F4F6' : 'white',
-                            border: course.id === selectedVideo?.id ? '2px solid var(--koche-blue)' : '1px solid var(--koche-silver)'
-                        }}
-                    >
-                        {/* Thumbnail */}
-                        <div style={{
-                            width: '140px',
-                            height: '80px',
-                            flexShrink: 0,
-                            borderRadius: 'var(--radius-sm)',
-                            overflow: 'hidden',
-                            position: 'relative',
-                            background: '#E5E7EB'
-                        }}>
-                            <img
-                                src={course.thumbnail}
-                                alt={course.title}
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    filter: course.isComingSoon ? 'grayscale(1)' : 'none'
-                                }}
-                            />
-                            {!course.isComingSoon && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    color: 'white',
-                                    background: 'rgba(0,0,0,0.6)',
-                                    borderRadius: '50%',
-                                    padding: '8px'
-                                }}>
-                                    <PlayCircle size={24} fill="currentColor" />
-                                </div>
-                            )}
-                            {course.isComingSoon && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    color: 'gray',
-                                }}>
-                                    <Lock size={20} />
-                                </div>
-                            )}
+                    <div className="curso__oferta">
+                        <span className="curso__oferta-label">Seu desconto ao concluir</span>
+                        <strong className="curso__oferta-valor">R$ 1.000</strong>
+                        <span className="curso__oferta-txt">em <strong>qualquer máquina Kóche</strong>, para quem conclui o curso com certificado*</span>
+                    </div>
+                    {!carregando && !selecionada && proxima && (
+                        <div>
+                            <button type="button" className="k-btn k-btn--primary k-btn--lg" onClick={() => abrir(proxima, AULAS.findIndex((a) => a.id === proxima.id))}>
+                                <PlayCircle size={20} /> {feitas ? `Continuar: ${proxima.titulo.split(' · ')[0]}` : 'Começar a Aula 1'}
+                            </button>
                         </div>
+                    )}
+                </section>
 
-                        {/* Info */}
-                        <div style={{ flex: 1 }}>
-                            <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem', color: course.isComingSoon ? 'gray' : 'var(--koche-blue)' }}>
-                                {course.title}
-                                {course.isComingSoon && (
-                                    <span style={{
-                                        fontSize: '0.7rem',
-                                        background: '#E5E7EB',
-                                        padding: '4px 8px',
-                                        borderRadius: '4px',
-                                        marginLeft: '10px',
-                                        color: 'gray',
-                                        fontWeight: '600'
-                                    }}>
-                                        EM BREVE
-                                    </span>
-                                )}
-                            </h4>
-                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                {course.description}
-                            </p>
+                {aviso && <p className="curso__aviso" role="alert">{aviso}</p>}
+
+                {selecionada && (
+                    <section className="k-card curso__player-card" ref={playerRef}>
+                        <div>
+                            <p className="k-eyebrow">Assistindo</p>
+                            <h2>{selecionada.titulo}</h2>
                         </div>
+                        <YouTubePlayer videoId={selecionada.videoId} titulo={selecionada.titulo} onProgresso={onProgresso} onConcluida={onConcluida} />
+                        <div className="curso__status">
+                            {selecionadaFeita
+                                ? <span className="k-selo k-selo--feita">Concluída</span>
+                                : <span>Assistido: <strong>{pctSelecionada}%</strong> · conta como concluída a partir de <strong>90%</strong></span>}
+                        </div>
+                        {dica && <p className={`curso__dica ${selecionadaFeita ? 'curso__dica--ok' : ''}`}>{dica}</p>}
+                    </section>
+                )}
+
+                <section className="curso__aulas" aria-label="Aulas">
+                    {AULAS.map((aula, i) => {
+                        const feita = estaConcluida(progresso, aula.id);
+                        const aberta = liberada(progresso, i);
+                        const atual = selecionada?.id === aula.id;
+                        const pctAula = percentualAula(progresso, aula.id);
+                        return (
+                            <button
+                                type="button"
+                                key={aula.id}
+                                onClick={() => abrir(aula, i)}
+                                className={`aula ${atual ? 'aula--atual' : ''} ${!aberta ? 'aula--bloqueada' : ''}`}
+                                aria-disabled={!aberta}
+                            >
+                                <div className="aula__thumb">
+                                    <img src={thumb(aula.videoId)} alt="" loading="lazy" />
+                                    <div className="aula__play"><span>{aberta ? <PlayCircle size={24} /> : <Lock size={20} />}</span></div>
+                                </div>
+                                <div className="aula__info">
+                                    <div className="aula__linha">
+                                        <span className={`k-selo ${feita ? 'k-selo--feita' : ''} ${!aberta ? 'k-selo--bloqueada' : ''}`}>
+                                            {feita ? 'Concluída' : aberta ? `Aula ${aula.numero}` : 'Bloqueada'}
+                                        </span>
+                                        {!feita && aberta && pctAula > 0 && <span className="aula__pct">assistido <b>{pctAula}%</b></span>}
+                                    </div>
+                                    <h3 className="aula__titulo">{aula.titulo}</h3>
+                                    <p className="aula__desc">{aberta ? aula.descricao : `Libera ao concluir a ${AULAS[i - 1].titulo.split(' · ')[0]}.`}</p>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </section>
+
+                <section className="k-card curso__teste">
+                    <div>
+                        <p className="k-eyebrow">Próximo passo</p>
+                        <h2>{tudo ? 'Faça o teste e garanta seu certificado' : 'Conclua as 3 aulas para liberar o teste'}</h2>
+                        <p className="k-muted">Aprovado no teste, você recebe o certificado e o desconto de R$ 1.000 fica registrado no seu nome.</p>
                     </div>
-                ))}
+                    <div className="curso__teste-acoes">
+                        {tudo && TESTE_DISPONIVEL
+                            ? <button type="button" className="k-btn k-btn--primary k-btn--lg" onClick={onStartQuiz}><CheckCircle2 size={20} /> Fazer o teste</button>
+                            : <button type="button" className="k-btn k-btn--lg" disabled>{tudo ? 'Teste disponível em breve' : 'Fazer o teste'}</button>}
+                        {!tudo && <span className="k-selo k-selo--bloqueada">{feitas} de {AULAS.length} aulas</span>}
+                    </div>
+                </section>
+
+                <p className="curso__nota">*Desconto de R$ 1.000 para quem concluir todas as aulas e for aprovado no teste. Uma vez por pessoa.</p>
             </div>
         </div>
     );
 }
+
+CourseScreen.propTypes = {
+    onBack: PropTypes.func.isRequired,
+    onStartQuiz: PropTypes.func,
+};
