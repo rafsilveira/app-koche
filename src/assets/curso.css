@@ -137,3 +137,11 @@
 .quiz__nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
 .quiz__nota { display: flex; align-items: center; gap: 14px; }
 .quiz__nota strong { font-family: var(--k-font-titulo); font-size: 42px; font-weight: 800; color: var(--k-navy); letter-spacing: -.02em; line-height: 1; }
+
+/* ---------- Certificado ---------- */
+.certificado { display: grid; gap: 12px; }
+.certificado__img { width: 100%; height: auto; border: 1px solid var(--k-gray-2); border-radius: var(--k-radius); box-shadow: var(--k-shadow); background: #fff; }
+.certificado__espera { aspect-ratio: 1754 / 1240; display: grid; place-items: center; border: 1px dashed var(--k-gray-2); border-radius: var(--k-radius); color: var(--k-gray-6); }
+.certificado__acoes { display: flex; flex-wrap: wrap; gap: 10px; }
+.certificado__codigo { margin: 0; font-size: 13.5px; }
+.certificado__codigo strong { color: var(--k-navy); font-family: var(--k-font-titulo); }

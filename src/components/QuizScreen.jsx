@@ -9,6 +9,9 @@ import { montarProva, corrigir, respondeuTudo, NOTA_MINIMA } from '../services/t
 import { AULAS, cursoConcluido, testeAprovado } from '../services/curso';
 import { carregarProgresso, salvarTeste, marcarEventoEnviado } from '../services/cursoStore';
 import { sendLeadToExternal } from '../services/leads';
+import { dadosCertificado, dataCurta } from '../services/certificado';
+import { registrarCertificado } from '../services/certificadoStore';
+import Certificado from './Certificado';
 
 export default function QuizScreen({ onBack }) {
     const { currentUser, userProfile } = useAuth();
@@ -29,6 +32,18 @@ export default function QuizScreen({ onBack }) {
         return () => { vivo = false; };
     }, [uid]);
 
+    const nomeAluno = userProfile?.name || currentUser?.displayName || '';
+    const certificado = progresso?.teste?.aprovadoEm ? dadosCertificado({ nome: nomeAluno, uid, teste: progresso.teste }) : null;
+
+    // Aprovado sem código gravado (aprovações anteriores ao certificado): gera, registra e grava — uma vez.
+    useEffect(() => {
+        if (!uid || !certificado || progresso?.teste?.certificado) return;
+        (async () => {
+            try { await registrarCertificado(certificado); } catch (e) { console.error('certificado: registro', e); }
+            try { await salvarTeste(uid, { certificado: certificado.codigo }); setProgresso((p) => ({ ...p, teste: { ...p.teste, certificado: certificado.codigo } })); } catch (e) { console.error('certificado: gravação', e); }
+        })();
+    }, [uid, certificado, progresso?.teste?.certificado]);
+
     const liberado = progresso ? cursoConcluido(progresso) : false;
     const jaAprovado = progresso ? testeAprovado(progresso) : false;
     const pergunta = prova[atual];
@@ -46,11 +61,18 @@ export default function QuizScreen({ onBack }) {
             const agora = new Date().toISOString();
             const dados = { nota: r.acertos, total: r.total, tentativas: (anterior.tentativas || 0) + 1, ultimaEm: agora };
             if (r.aprovado && !anterior.aprovadoEm) dados.aprovadoEm = agora;
+            const testeNovo = { ...anterior, ...dados };
+            let cert = null;
+            if (r.aprovado) {
+                cert = dadosCertificado({ nome: nomeAluno, uid, teste: testeNovo });
+                if (!anterior.certificado) dados.certificado = cert.codigo;
+            }
             await salvarTeste(uid, dados);
             const novo = { ...(progresso || { aulas: {} }), teste: { ...anterior, ...dados } };
             setProgresso(novo);
+            if (cert && !anterior.certificado) { try { await registrarCertificado(cert); } catch (e) { console.error('certificado: registro', e); } }
             if (r.aprovado && !anterior.eventoEnviadoEm) {
-                const ok = await sendLeadToExternal({ name: userProfile?.name || currentUser?.displayName, email: userProfile?.email || currentUser?.email, phone: userProfile?.phone, uid }, 'curso_aprovado');
+                const ok = await sendLeadToExternal({ name: nomeAluno, email: userProfile?.email || currentUser?.email, phone: userProfile?.phone, uid, certificado: cert?.codigo, validadeDesconto: cert?.validadeDesconto }, 'curso_aprovado');
                 if (ok) { await marcarEventoEnviado(uid); setProgresso((p) => ({ ...p, teste: { ...p.teste, eventoEnviadoEm: new Date().toISOString() } })); }
             }
         } catch (e) {
@@ -88,8 +110,8 @@ export default function QuizScreen({ onBack }) {
                         {jaAprovado ? (
                             <>
                                 <div className="quiz__nota"><strong>{progresso.teste.nota}/{progresso.teste.total}</strong><span className="k-selo k-selo--feita">Aprovado</span></div>
-                                <p className="k-muted">Seu desconto de R$ 1.000 em qualquer máquina Kóche está registrado no seu nome. A equipe Kóche fala com você pelo WhatsApp.</p>
-                                <p className="curso__dica">Certificado: em breve disponível nesta tela.</p>
+                                <p className="k-muted">Seu desconto de R$ 1.000 em qualquer máquina Kóche está registrado no seu nome{certificado ? ` e vale até ${dataCurta(certificado.validadeDesconto)}` : ''}. A equipe Kóche fala com você pelo WhatsApp.</p>
+                                {certificado && <Certificado dados={certificado} />}
                             </>
                         ) : (
                             <>
@@ -139,8 +161,9 @@ export default function QuizScreen({ onBack }) {
                         {resultado.aprovado ? (
                             <>
                                 <h2>Parabéns, você concluiu o curso</h2>
-                                <p className="k-muted">Seu desconto de R$ 1.000 em qualquer máquina Kóche está registrado no seu nome. A equipe Kóche fala com você pelo WhatsApp.</p>
-                                <p className="curso__dica curso__dica--ok">{salvando ? 'Registrando sua aprovação…' : 'Aprovação registrada. Certificado: em breve disponível nesta tela.'}</p>
+                                <p className="k-muted">Seu desconto de R$ 1.000 em qualquer máquina Kóche está registrado no seu nome{certificado ? ` e vale até ${dataCurta(certificado.validadeDesconto)}` : ''}. A equipe Kóche fala com você pelo WhatsApp.</p>
+                                {salvando && <p className="curso__dica curso__dica--ok">Registrando sua aprovação…</p>}
+                                {!salvando && certificado && <Certificado dados={certificado} />}
                             </>
                         ) : (
                             <>

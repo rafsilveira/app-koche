@@ -11,6 +11,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 // carrega o SDK do Gemini, que é pesado.
 const CourseScreen = lazy(() => import('./components/CourseScreen'));
 const QuizScreen = lazy(() => import('./components/QuizScreen'));
+const VerificarCertificado = lazy(() => import('./components/VerificarCertificado'));
 const AssistantScreen = lazy(() => import('./components/AssistantScreen'));
 const AdminScreen = lazy(() => import('./components/AdminScreen'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -40,6 +41,12 @@ function AppContent() {
   }, []);
 
   console.log("AppContent Render:", { currentUser, userProfile, currentView });
+
+  // Verificação pública de certificado (?certificado=KCH-…): sem login, antes do guard.
+  const codigoCertificado = new URLSearchParams(window.location.search).get('certificado');
+  if (codigoCertificado) {
+    return <Suspense fallback={<ViewLoading />}><VerificarCertificado codigo={codigoCertificado} /></Suspense>;
+  }
 
   // GUARD: Use must be logged in
   if (!currentUser) {

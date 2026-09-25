@@ -39,6 +39,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Certificados do curso (25/Set/2026): registro público por código, para a página de verificação
+    // (?certificado=KCH-…). Só o próprio aluno, já aprovado no teste, cria o seu; ninguém edita ou apaga.
+    // O documento não guarda telefone nem e-mail — só nome, curso, carga horária, nota e datas.
+    match /certificados/{codigo} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'nome', 'curso', 'cargaHoraria', 'nota', 'total', 'aprovadoEm', 'emitidoEm'])
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.curso.teste.aprovadoEm != null;
+      allow update, delete: if false;
+    }
+
     // Qualquer coleção futura não listada acima: negada por padrão
     // (seguro por padrão) até definirmos a regra específica.
     match /{document=**} {

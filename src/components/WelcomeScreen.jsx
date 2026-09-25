@@ -36,7 +36,7 @@ function WelcomeScreen({ onStartGuide, onStartCourse, onStartAssistant, onAdmin,
                     <p className="k-banner__titulo">Ganhe <em>R$ 1.000 de desconto</em> em qualquer máquina Kóche*</p>
                     <p className="k-banner__txt">3 aulas em vídeo, teste ao final e certificado. O desconto fica registrado no seu nome.</p>
                     <button type="button" onClick={onStartCourse} className="k-btn k-btn--primary k-btn--block"><GraduationCap size={20} /> Começar o curso</button>
-                    <p className="k-banner__nota">*Para quem concluir todas as aulas e for aprovado no teste. Uma vez por pessoa.</p>
+                    <p className="k-banner__nota">*Válido por 30 dias a partir da aprovação no teste. Uma vez por pessoa.</p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

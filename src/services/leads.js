@@ -37,6 +37,8 @@ export async function sendLeadToExternal(user, evento = 'cadastro') {
         phone: user.phone,
         uid: user.uid,
         evento,
+        ...(user.certificado ? { certificado: user.certificado } : {}),
+        ...(user.validadeDesconto ? { validadeDesconto: user.validadeDesconto } : {}),
         date: new Date().toISOString(),
         source: "App Koche"
     };

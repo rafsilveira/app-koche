@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import YouTubePlayer from './YouTubePlayer';
 import { AULAS, TESTE_DISPONIVEL, thumb, liberada, estaConcluida, concluidas, cursoConcluido, percentualCurso, percentualAula, proximaAula, testeAprovado } from '../services/curso';
 import { carregarProgresso, salvarAula } from '../services/cursoStore';
+import { NOTA_ASTERISCO } from '../services/certificado';
 
 export default function CourseScreen({ onBack, onStartQuiz }) {
     const { currentUser } = useAuth();
@@ -160,11 +161,11 @@ export default function CourseScreen({ onBack, onStartQuiz }) {
                     <div>
                         <p className="k-eyebrow">Próximo passo</p>
                         <h2>{aprovado ? 'Teste concluído: você foi aprovado' : tudo ? 'Faça o teste e garanta seu desconto' : 'Conclua as 3 aulas para liberar o teste'}</h2>
-                        <p className="k-muted">{aprovado ? `Nota ${progresso.teste.nota}/${progresso.teste.total}. Seu desconto de R$ 1.000 está registrado no seu nome.` : 'Aprovado no teste, você recebe o certificado e o desconto de R$ 1.000 fica registrado no seu nome.'}</p>
+                        <p className="k-muted">{aprovado ? `Nota ${progresso.teste.nota}/${progresso.teste.total}. Seu desconto de R$ 1.000 está registrado no seu nome e o certificado está pronto.` : 'Aprovado no teste, você recebe o certificado e o desconto de R$ 1.000 fica registrado no seu nome.'}</p>
                     </div>
                     <div className="curso__teste-acoes">
                         {aprovado
-                            ? <><span className="k-selo k-selo--feita">Aprovado</span><button type="button" className="k-btn k-btn--ghost" onClick={onStartQuiz}>Ver resultado</button></>
+                            ? <><span className="k-selo k-selo--feita">Aprovado</span><button type="button" className="k-btn k-btn--primary" onClick={onStartQuiz}>Ver certificado</button></>
                             : tudo && TESTE_DISPONIVEL
                                 ? <button type="button" className="k-btn k-btn--primary k-btn--lg" onClick={onStartQuiz}><CheckCircle2 size={20} /> Fazer o teste</button>
                                 : <button type="button" className="k-btn k-btn--lg" disabled>{tudo ? 'Teste disponível em breve' : 'Fazer o teste'}</button>}
@@ -172,7 +173,7 @@ export default function CourseScreen({ onBack, onStartQuiz }) {
                     </div>
                 </section>
 
-                <p className="curso__nota">*Desconto de R$ 1.000 para quem concluir todas as aulas e for aprovado no teste. Uma vez por pessoa.</p>
+                <p className="curso__nota">{NOTA_ASTERISCO}</p>
             </div>
         </div>
     );
