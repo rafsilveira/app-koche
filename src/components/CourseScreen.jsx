@@ -116,6 +116,11 @@ export default function CourseScreen({ onBack, onStartQuiz }) {
                 )}
 
                 <section className="curso__aulas" aria-label="Aulas">
+                    <div className="curso__lista-head">
+                        <p className="k-eyebrow">Conteúdo do curso</p>
+                        <h2>As {AULAS.length} aulas, em ordem</h2>
+                        <p className="k-muted">Toque numa aula liberada para assistir. A seguinte abre quando você concluir a anterior.</p>
+                    </div>
                     {AULAS.map((aula, i) => {
                         const feita = estaConcluida(progresso, aula.id);
                         const aberta = liberada(progresso, i);
@@ -135,10 +140,12 @@ export default function CourseScreen({ onBack, onStartQuiz }) {
                                 </div>
                                 <div className="aula__info">
                                     <div className="aula__linha">
-                                        <span className={`k-selo ${feita ? 'k-selo--feita' : ''} ${!aberta ? 'k-selo--bloqueada' : ''}`}>
-                                            {feita ? 'Concluída' : aberta ? `Aula ${aula.numero}` : 'Bloqueada'}
-                                        </span>
-                                        {!feita && aberta && pctAula > 0 && <span className="aula__pct">assistido <b>{pctAula}%</b></span>}
+                                        {atual && !feita
+                                            ? <span className="k-selo k-selo--vermelho">Reproduzindo</span>
+                                            : <span className={`k-selo ${feita ? 'k-selo--feita' : ''} ${!aberta ? 'k-selo--bloqueada' : ''}`}>
+                                                {feita ? 'Concluída' : aberta ? `Aula ${aula.numero}` : 'Bloqueada'}
+                                            </span>}
+                                        {!feita && aberta && !atual && pctAula > 0 && <span className="aula__pct">assistido <b>{pctAula}%</b></span>}
                                     </div>
                                     <h3 className="aula__titulo">{aula.titulo}</h3>
                                     <p className="aula__desc">{aberta ? aula.descricao : `Libera ao concluir a ${AULAS[i - 1].titulo.split(' · ')[0]}.`}</p>
