@@ -55,7 +55,8 @@ export async function desenharCertificado(d) {
 
     // assinatura sobre a linha, nome e empresa
     const yLinha = 1030;
-    if (assinatura) { const h = 300, w = (assinatura.width / assinatura.height) * h; ctx.drawImage(assinatura, M + 40, yLinha - h + 14, w, h); }
+    // assinatura na horizontal (Rafael, 25/Set: "rotaciona anti-horário 90 graus"): cabe na largura da linha, com a base encostando nela
+    if (assinatura) { const h = 170, w = (assinatura.width / assinatura.height) * h; ctx.drawImage(assinatura, M + 20, yLinha - h + 18, Math.min(w, 440), h); }
     ctx.fillStyle = COR.gray2; ctx.fillRect(M, yLinha, 480, 3);
     ctx.fillStyle = COR.navy; ctx.font = '700 30px Navigo'; ctx.fillText(ASSINANTE.nome, M, yLinha + 46);
     ctx.fillStyle = COR.gray6; ctx.font = '400 24px Manrope'; ctx.fillText(ASSINANTE.empresa, M, yLinha + 82);
